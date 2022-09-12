@@ -55,7 +55,10 @@ int("beef",16)
 #délka pole
 l=[2,1,5,3,6,9]
 len(l)
-#konkrétní index
+#konkrétní index, idexování:
+# 0  1  2  3
+# -  -  -  -
+#-4 -3 -2 -1
 l[4]
 #slice - od
 l[1:]
@@ -73,16 +76,16 @@ l.remove()
 l.sort()
 # otočení
 l.reverse()
-# vyndání posledního
+# vyndání posledního, či konkrétního
 l.pop()
 # přidání dalšího na poslední místo
 l.append()
 # přidání dalšího na konkrétní pozici
-l.insert(0,12)
+l.insert(0,12) #index, hodnota
 # all = všechny hodnoty dávají True
 all(l)
-# any = alespoň jedna hodnota dává False
-h=[0,0,0,0,0,None, ""] 
+# any = alespoň jedna hodnota dává True
+h = [0,0,0,0,0,None, ""]
 any(h)
 # součet řady
 sum(l)
@@ -90,5 +93,29 @@ sum(list(range(1,100)))
 
 # filtrace - z range(20) beru jen ty, co vyhovují podmínce x**2 < 20
 list(filter (lambda x: x**2 < 20, range(20)))
+#sudá čísla:
+list(filter (lambda x: x%2==0, range(80)))
+
+#test, zda je prvek v sekvenci
+20 in l
+#Očíslování sekvence
+list(enumerate("ahoj"))
+dict(enumerate("ahoj"))
+#totéž s použitím zip
+d=dict(zip("abc", range(4)))
+#klíče na seznam
+list(d.keys())
+d.values()
+d.items()
+#množiny
+a=set(range(1,10))
+b=set(range(10,15))
+#operace příslušnosti:
+#podmnožina
+set([2,3,4]).issubset(a)
+#nadmnožina:
+a.issuperset([2,3,4])
+#disjunkce
+a.isdisjoint([20,21,22])
 
 print("hello")
