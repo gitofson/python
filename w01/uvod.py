@@ -114,8 +114,8 @@ b=set(range(10,15))
 #podmnožina
 set([2,3,4]).issubset(a)
 #nadmnožina:
-a.issuperset([2,3,4])
+a.issuperset({2,3,4})
 #disjunkce
-a.isdisjoint([20,21,22])
+a.isdisjoint({20,21,22})
 
 print("hello")
