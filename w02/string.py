@@ -23,3 +23,9 @@ print(text[::2])
 print(text[::-2])
 #otočení textu
 print(text[::-1])
+
+# řetězec na seznam se zadáním delícího znaku
+s = 'franta standa lojza'
+s.split(" ")
+# seznam na řetězec se zadáním delícího znaku
+" ".join(['franta', 'standa', 'lojza'])
