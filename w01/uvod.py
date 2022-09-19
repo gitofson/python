@@ -92,9 +92,9 @@ sum(l)
 sum(list(range(1,100)))
 
 # filtrace - z range(20) beru jen ty, co vyhovují podmínce x**2 < 20
-list(filter (lambda x: x**2 < 20, range(20)))
+list(filter(lambda x:))
 #sudá čísla:
-list(filter (lambda x: x%2==0, range(80)))
+list(filter(lambda x: x%2==0, range(80)))
 
 #test, zda je prvek v sekvenci
 20 in l
