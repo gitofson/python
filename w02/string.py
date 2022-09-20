@@ -14,6 +14,9 @@ print("\u0122")
 #\Uhhhhhhhh  - znak se zadanou 32bit hex hodnotou
 print("\U00000122")
 
+# nahrazování
+"*** ***".replace("*","5")
+
 # řezání řetězců - stejné jako u seznamů:
 text = "Ostrý šíp"
 print(text[1:3])
