@@ -15,6 +15,7 @@ import sys
 
 
 words = collections.defaultdict(int)
+#words = {}
 strip = string.whitespace + string.punctuation + string.digits + "\"'"
 for filename in sys.argv[1:]:
     for line in open(filename):
