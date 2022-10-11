@@ -17,47 +17,19 @@ while(a < 10):
     if a == 4:
         continue
     print(a)
-#    if a == 8:
-#        break
+    if a > 8:
+        break
 # else se vykoná pokud se cyklus while ukončí standartním způsobem (např. nedojde k break),
 # nepovinné
 else:
-    print("else: a:{}", a)
+    print("else: a:{}".format(a))
 # cyklus for
 for i in range(5):
     print(i)
+    if(i==3):
+        break
 else:
-    print("ukončeno, i= {}", i)
+    print("ukončeno, i= {}".format(i))
     
-# Příklad použití výjimek. funkce list_find(lst, target) vrátí index prvku target v seznamu
-# lst. Při nenalezení prvku vrátí -1
-def list_find(lst, target):
-    try:
-        index = lst.index(target)
-    except ValueError:
-        index = -1
-    return index
 
-def read_data(filename):
-    lines = []
-    fh = None
-    try:
-        fh = open(filename, encoding="utf8")
-        for line in fh:
-            if line.strip():
-                lines.append(line)
-    except (IOError, OSError) as err:
-        print(err)
-        return []
-    finally:
-        if fh is not None:
-            fh.close()
-    return lines
-
-# Vyvolání výjimky:
-# raise výjimka(argumenty)
-
-# Definice vlastní výjimky:
-# class názevVýjimky(bázováVýjika):
-#    pass
         
