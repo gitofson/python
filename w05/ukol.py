@@ -27,3 +27,27 @@
 # Prvky udržujte v abecedním pořadí nezávislém na velikosti písmen. Kontrolujte,
 # zda je seznam špinavý (tj. změněn bez uložení). Možnost uložení nabídněte pouze tehdy,
 # pokud je seznam špinavý.
+
+# Nápověda: řešte implementací následujících funkcí:
+# choose_file(): zjistí počet ".lst" souborů v aktuální adresáři, pokud je nulový, zadá
+#               výzvu k zadání souboru. Pokud není nulový, zadá výzvu k výběru souboru.
+#               Vrací filename, items
+
+# print_list(items): vypíše položky
+
+# get_choice(items, dirty): vypíše volbu, co dělat s položkami
+#               Vrací choice 
+
+# add_item(items, dirty): zeptá se jakou položku má do seznamu přidat a přidá jí tam.
+#               Vrací dirty
+
+# delete_item(item, dirty): zeptá se jakou položku má ze seznamu vymazat a pokud tam je,
+#                           vymaže jí.
+#               Vrací dirty
+
+# load_list(filename): otevře soubor a načte položky.
+#               Vrací items
+
+# save_list(filename, items): uloží položky do souboru filename
+
+
