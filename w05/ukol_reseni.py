@@ -1,7 +1,40 @@
 import os
 
 def main():
-  items = []
+    dirty = False
+    #items = []
+    filename, items = chose_file()
+    print("filename: {:s}, items: ".format(filename), end="")
+    print(items)
+    
+# choose_file(): zjistí počet ".lst" souborů v aktuální adresáři, pokud je nulový, zadá
+#               výzvu k zadání souboru. Pokud není nulový, zadá výzvu k výběru souboru.
+#               Vrací filename, items
+def chose_file():
+    items = []
+    file_list = list(filter(lambda x:x.endswith(".lst"), os.listdir(".")))
+    if len(file_list) == 0:
+        filename = get_string("zadej název souboru")
+        if filename.endswith(".lst"):
+            pass
+        else:
+            filename += ".lst"
+    else:
+        cnt = 0
+        for fn in file_list:
+            print("{:d} - {:s}".format(cnt, fn))
+            cnt += 1
+        selected_idx = get_integer("Zvolte soubor")
+        filename = file_list[selected_idx]
+        items = ["zde", "musíme", "poupravit"]
+    return filename, items
+
+# load_list(filename): otevře soubor a načte položky.
+#               Vrací items
+def load_list(filename):
+    fn = open(filename, "r")
+#    fn.read
+#def save_items()
   
 def get_string(message, name="string", default=None,
                minimum_length=0, maximum_length=80):
