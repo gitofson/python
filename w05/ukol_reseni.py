@@ -52,7 +52,40 @@ def save_items(filename, items):
         print("Chyba při zápisu do souboru {}".format(filename), file = sys.stderr)
     finally:
         fn.close()
-  
+
+
+def add_item(items, dirty):
+    polozka = get_string("Zadej polozku:")
+    if polozka in items:
+        return dirty
+    else:
+        items.append(polozka)
+        return True
+
+    # get_choice(items, dirty): vypíše volbu, co dělat s položkami
+    #               Vrací choice
+def get_choice(items, dirty):
+    if items :
+        vyber = get_integer("Vyber položku \n"
+                            "0 - konec\n"
+                            "1 - add položku \n"
+                            "2 - uložit \n" if dirty else ""
+                            "3 - delete položku")
+        return vyber
+
+    else:
+        vyber = get_integer("Vyber položku \n"
+                            "0 - konec\n"
+                            "1 - add položku \n"
+                            "2 - uložit \n" if dirty else "")
+        return vyber
+def delete_item(items, dirty):
+    polozka = get_string("Zadej polozku")
+    if polozka in items:
+        items.remove(polozka)
+        return True
+    else:
+        return dirty
 def get_string(message, name="string", default=None,
                minimum_length=0, maximum_length=80):
     message += ": " if default is None else " [{0}]: ".format(default)
@@ -103,6 +136,4 @@ def get_integer(message, name="integer", default=None, minimum=0,
             print("ERROR", err)
         except ValueError as err:
             print("ERROR {0} must be an integer".format(name))
-
-
 main()
