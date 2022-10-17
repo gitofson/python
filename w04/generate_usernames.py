@@ -58,22 +58,39 @@ def generate_username(fields, usernames):
 
 
 def print_users(users):
-    namewidth = 32
-    usernamewidth = 9
+    namewidth = 24
+    usernamewidth = 17
+
+    # print("{0:<{nw}} {1:^6} {2:{uw}}".format(
+    #       "Name", "ID", "Username", nw=namewidth, uw=usernamewidth))
+    # print("{0:-<{nw}} {0:-<6} {0:-<{uw}}".format(
+    #       "", nw=namewidth, uw=usernamewidth))
 
     print("{0:<{nw}} {1:^6} {2:{uw}}".format(
           "Name", "ID", "Username", nw=namewidth, uw=usernamewidth))
     print("{0:-<{nw}} {0:-<6} {0:-<{uw}}".format(
           "", nw=namewidth, uw=usernamewidth))
 
+    count = 0;
     for key in sorted(users):
+        count+=1
         user = users[key]
         initial = ""
+        if count % 2 == 0:
+            ender = "\n"
+        else:
+            ender = ""
         if user.middlename:
             initial = " " + user.middlename[0]
-        name = "{0.surname}, {0.forename}{1}".format(user, initial)
-        print("{0:.<{nw}} ({1.id:4}) {1.username:{uw}}".format(
-              name, user, nw=namewidth, uw=usernamewidth))
+        name = "{u.forename}{i}, {u.surname}".format(u=user, i=initial)
+        print("{u.username:<{uw}} ({u.id:4}) {n:>{nw}} ".format(
+              n=name, u=user, nw=namewidth, uw=usernamewidth), end=ender)
+        if count % 64 == 0:
+            print("\n{0:<{uw}} {1:^6} {2:{nw}} {0:<{uw}} {1:^6} {2:{nw}}".format(
+                "Username", "ID", "Name", nw=namewidth, uw=usernamewidth))
+            print("{0:-<{uw}} {0:-<6} {0:-<{nw}} {0:-<{uw}} {0:-<6} {0:-<{nw}}".format(
+                "", nw=namewidth, uw=usernamewidth))
+
 
 
 main()

@@ -1,4 +1,4 @@
-import os
+import os, sys
 
 def main():
     dirty = False
@@ -19,22 +19,39 @@ def chose_file():
             pass
         else:
             filename += ".lst"
+        save_items(filename, [])
     else:
         cnt = 0
         for fn in file_list:
             print("{:d} - {:s}".format(cnt, fn))
             cnt += 1
-        selected_idx = get_integer("Zvolte soubor")
+        selected_idx = get_integer("Zvolte index souboru")
         filename = file_list[selected_idx]
-        items = ["zde", "musíme", "poupravit"]
+        items = load_list(filename)
     return filename, items
 
 # load_list(filename): otevře soubor a načte položky.
 #               Vrací items
 def load_list(filename):
-    fn = open(filename, "r")
+    try:
+        fn = open(filename, "r")
+        items = fn.readline().split(" ")
+    except:
+        print("Chyba při čtení souboru {}".format(filename), file = sys.stderr)
+    finally:
+        fn.close()
+    return items
+
 #    fn.read
-#def save_items()
+# save_list(filename, items): uloží položky do souboru filename
+def save_items(filename, items):
+    try:
+        fn = open(filename, "w")
+        fn.writelines(" ".join(items))
+    except:
+        print("Chyba při zápisu do souboru {}".format(filename), file = sys.stderr)
+    finally:
+        fn.close()
   
 def get_string(message, name="string", default=None,
                minimum_length=0, maximum_length=80):
