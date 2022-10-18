@@ -18,4 +18,5 @@ print (basename(filename))
 from os.path import *
 print (basename(filename)) 
 
-# Balíček založíme tak, že vytvoříme adresář a do něj vytvoříme soubor __init__.py
+# Balíček založíme tak, že vytvoříme adresář a do něj vytvoříme soubor __init__.py, viz balíček
+# Graphics a v něm balíček Vector

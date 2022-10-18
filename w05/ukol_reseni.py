@@ -1,7 +1,7 @@
 import os, sys
 
 def main():
-    dirty = True
+    dirty = False
     #items = []
     filename, items = chose_file()
     while True:
@@ -9,9 +9,9 @@ def main():
         choice = get_choice(items, dirty)
         if choice == 1:
             dirty = add_item(items, dirty)
-        elif choice == 2:
-            dirty = delete_item(items, dirty)
         elif choice == 3:
+            dirty = delete_item(items, dirty)
+        elif choice == 2:
             if dirty: 
                 save_items(filename, items)
         else: 
@@ -78,18 +78,19 @@ def add_item(items, dirty):
     #               Vrací choice
 def get_choice(items, dirty):
     if items:
-        vyber = get_integer("Vyber položku " 
+        vyber = get_integer("Vyber položku:\n" 
                             "0 - konec \n"  
                             "1 - add položku \n"   
-                            "2 - vymazat položku \n"
-                            "3 - uložit \n" if dirty else "")
+                            ("2 - uložit \n" if dirty else "\n")
+                            "3 - vymazat položku \n"
+                            )
         return vyber
 
     else:
-        vyber = get_integer('Vyber položku' +
-                            '0 - konec \n'  +
-                            '1 - add položku \n' +
-                            '2 - uložit \n' if dirty else '')
+        vyber = get_integer('Vyber položku:\n'
+                            '0 - konec \n'
+                            '1 - add položku \n'
+                            ('2 - uložit \n' if dirty else '\n'))
         return vyber
 
 # print_list(items): vypíše položky  
