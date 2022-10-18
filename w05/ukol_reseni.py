@@ -1,11 +1,23 @@
 import os, sys
 
 def main():
-    dirty = False
+    dirty = True
     #items = []
     filename, items = chose_file()
-    print("filename: {:s}, items: ".format(filename), end="")
-    print(items)
+    while True:
+        print_list(items)
+        choice = get_choice(items, dirty)
+        if choice == 1:
+            dirty = add_item(items, dirty)
+        elif choice == 2:
+            dirty = delete_item(items, dirty)
+        elif choice == 3:
+            if dirty: 
+                save_items(filename, items)
+        else: 
+            break
+    
+    
     
 # choose_file(): zjistí počet ".lst" souborů v aktuální adresáři, pokud je nulový, zadá
 #               výzvu k zadání souboru. Pokud není nulový, zadá výzvu k výběru souboru.
@@ -65,19 +77,19 @@ def add_item(items, dirty):
     # get_choice(items, dirty): vypíše volbu, co dělat s položkami
     #               Vrací choice
 def get_choice(items, dirty):
-    if items :
-        vyber = get_integer("Vyber položku \n" +
-                            "0 - konec\n" +
-                            "1 - add položku \n" +
-                            "2 - vymazat položku" +
+    if items:
+        vyber = get_integer("Vyber položku " 
+                            "0 - konec \n"  
+                            "1 - add položku \n"   
+                            "2 - vymazat položku \n"
                             "3 - uložit \n" if dirty else "")
         return vyber
 
     else:
-        vyber = get_integer("Vyber položku \n" +
-                            "0 - konec\n" +
-                            "1 - add položku \n" +
-                            "2 - uložit \n" if dirty else "")
+        vyber = get_integer('Vyber položku' +
+                            '0 - konec \n'  +
+                            '1 - add položku \n' +
+                            '2 - uložit \n' if dirty else '')
         return vyber
 
 # print_list(items): vypíše položky  
