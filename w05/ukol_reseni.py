@@ -78,18 +78,18 @@ def add_item(items, dirty):
     #               Vrací choice
 def get_choice(items, dirty):
     if items:
-        vyber = get_integer("Vyber položku:\n" 
-                            "0 - konec \n"  
-                            "1 - add položku \n"   
-                            ("2 - uložit \n" if dirty else "\n")
+        vyber = get_integer("Vyber položku:\n" +
+                            "0 - konec \n"  +
+                            "1 - add položku \n"  + 
+                            ("2 - uložit \n" if dirty else "\n") +
                             "3 - vymazat položku \n"
                             )
         return vyber
 
     else:
-        vyber = get_integer('Vyber položku:\n'
-                            '0 - konec \n'
-                            '1 - add položku \n'
+        vyber = get_integer('Vyber položku:\n'+
+                            '0 - konec \n'+
+                            '1 - add položku \n'+
                             ('2 - uložit \n' if dirty else '\n'))
         return vyber
 
