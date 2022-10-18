@@ -79,7 +79,13 @@ def get_choice(items, dirty):
                             "1 - add položku \n" +
                             "2 - uložit \n" if dirty else "")
         return vyber
-    
+
+# print_list(items): vypíše položky  
+def print_list(items):
+    for item in items: 
+        print(item, end=", ") 
+    print()    
+
 def delete_item(items, dirty):
     polozka = get_string("Zadej polozku")
     if polozka in items:
