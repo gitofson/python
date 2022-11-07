@@ -40,4 +40,27 @@
 # __truediv__(self, other)      x/y
 # __itruediv__(self, other)     x/=y
 # __rtruediv__(self, other)     y/x
+# __divmod__(self, other)       divmod(x, y)
+# __rdivmod__(self, other)      divmod(y, x)
+# __pow__(self, other)          x**y
+# __ipow__(self, other)         x**=y
+# __rpow__(self, other)         y**x
+# __xor__(self, other)          x^y
+# __ixor__(self, other)         x^=y
+# __rxor__(self, other)         y^x
+# __slhift__(self, other)       x<<y
+# __ilshif__(self, other)       x<<=y
+# __rlshift__(self, other)      y<<x
+# __and__(self, other)          x&y
+# __iand__(self, other)         x&=y
+# __rand__(self, other)         y&x
+# __or__(self, other)           x|y
+# __ior__(self, other)          x|=y
+# __ror__(self, other)          y|x
+# __rshift__(self, other)       x&y
+# __irshift__self, other)       x&=y
+# __rrshift__(self, other)      y&x
+# __invert__(self)              ~x
+
+
 
