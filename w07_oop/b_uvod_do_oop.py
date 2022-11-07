@@ -1,4 +1,4 @@
-# Termíny třída, typ a datový typ znamenají v Pythonu totéž.
+# Termíny třída, typ a datový typ znamenají v Pythonu totéž!
 # Jednou z výhod objektového přístupu je možnost specializace třídy pomocí dědění.
 # Bázová třída (base class), či nadtřída (super class) jsou předci, podtřída pak
 # potomek. Princip, kdy máme v bázové třídě a podtřídě definovanou stejnou metodu

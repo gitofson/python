@@ -11,6 +11,7 @@ distance = distance_from_origin(*circle[:2])
 import collections
 Circle = collections.namedtuple("Circle", "x y radius")
 circle = Circle(13,84,9)
+circle2 = Circle(6, 4, 2)
 distance = distance_from_origin(circle.x, circle.y)
 
 # Stále však zůstává problém validace dat. Např. vždy půjde napsat
