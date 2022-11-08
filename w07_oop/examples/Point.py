@@ -66,10 +66,21 @@ class Point:
         return math.hypot(self.x, self.y)
 
 
+    # ==
     def __eq__(self, other):
         return self.x == other.x and self.y == other.y
 
-
+    # x + y
+    def __add__(self, other):
+        return Point(self.x + other.x, self.y + other.y)
+    # p += q
+    def __iadd__(self, other):
+        self.x += other.x
+        self.y += other.y
+        return self
+        # nebo vytvořím nový objekt
+        #return Point(self.x + other.x, self.y + other.y)
+    
     def __repr__(self):
         return "Point({0.x!r}, {0.y!r})".format(self)
 
@@ -134,3 +145,8 @@ class Circle(Point):
 if __name__ == "__main__":
     import doctest
     doctest.testmod()
+    p1 = Point(1,1)
+    p2 = Point(2,2)
+    print(p1+p2)
+    p2 += Point(4,4)
+    print(p2)

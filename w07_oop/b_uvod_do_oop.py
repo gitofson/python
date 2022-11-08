@@ -37,12 +37,16 @@ class Bod:
 class Kruh(Bod):
     def __init__(self, x=0, y=0, r=0):
         # volání konstruktoru z nadtřídy
-        super().__init__(self, x, y)
+        super().__init__(x, y)
         self.r = r
 
 a = Bod()
 repr(a)
 b = Bod(4, 6)
 str(b)
-b.distance_from_origin()
-a == b, b != a
+print(b.distance_from_origin())
+print(a == b, b != a)
+cs = (Kruh(8, 4, 10), Kruh(5, 5, 5), Kruh(0, 0, 6))
+
+for x in cs:
+    print(x, x.distance_from_origin())

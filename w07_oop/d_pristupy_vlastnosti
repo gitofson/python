@@ -28,19 +28,23 @@ class Bod:
     # s - řetězcová forma
     # a - reprezentační forma jen s ASCII znaky
     def __repr__(self):
-        return "Bod({0.__x!r}, {0.__y!r})".format(self)
+        return "Bod({0.x!r}, {0.y!r})".format(self)
     
     # přetížení (str) (vrátí řetězcovou formu)
     def __str__(self):
-        return "({0.__x!r}, {0.__y!r})".format(self)
+        return "({0.x!r}, {0.y!r})".format(self)
 
 # definice podtřídy s bázovou třídou Bod
 class Kruh(Bod):
     def __init__(self, x=0, y=0, r=0):
         # volání konstruktoru z nadtřídy
-        super().__init__(self, x, y)
+        super().__init__(x, y)
         self.__r = r
         
     @property
     def r(self):
         return self.__r
+
+k = Kruh(5,5,5)
+print(k)
+print(k.r)
