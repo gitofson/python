@@ -118,4 +118,9 @@ a.issuperset({2,3,4})
 #disjunkce
 a.isdisjoint({20,21,22})
 
+#množinové operace
+#sjednocení
+a | b
+#průnik
+a & b
 print("hello")
