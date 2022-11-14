@@ -45,7 +45,7 @@ False
 
 _identity = lambda x: x
 
-
+# tvorba třídy agregací
 class SortedList:
 
     def __init__(self, sequence=None, key=None):
