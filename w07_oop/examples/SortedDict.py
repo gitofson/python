@@ -48,7 +48,7 @@ False
 
 import SortedList
 
-# Tvorba třídy odvozením
+# Tvorba třídy představující kolekci odvozením
 class SortedDict(dict):
 
     def __init__(self, dictionary=None, key=None, **kwargs):
