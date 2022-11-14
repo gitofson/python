@@ -63,6 +63,8 @@ AttributeError: 'Image' object has no attribute 'thing'
 """
 
 import os
+# podpora ukládání a načítání objektů pomocí nakládání (pickling). Jde o obdobu serializace. V případě nakládáni
+# lze však ukládat i kolekce a kolekce kolekcí.
 import pickle
 
 USE_GETATTR = False
