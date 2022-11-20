@@ -26,7 +26,10 @@ class App:
     def on_key_down(self, event):
         print("key down...")
         print(event)
-        pass
+        if event.key == pygame.K_LEFT:
+            self._star_position_x -= 1
+        if event.key == pygame.K_RIGHT:
+            self._star_position_x += 1
     def on_key_up(self, event):
         pass
     def on_mouse_focus(self):
