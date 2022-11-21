@@ -8,8 +8,11 @@ class App:
         self._image_surf = None
         self.size = self.weight, self.height = 640, 400
         self._display_surf = None
+        self._clock = None
         self._star_position_x = 0
         self._star_position_y = 0
+        self._star_velocity_x = 0
+        self._star_velocity_y = 0
  
     def on_init(self):
         # inicializace PyGame modulů
@@ -19,6 +22,7 @@ class App:
         self._running = True
         # načtení obrázku
         self._image_surf = pygame.image.load("../resources/star.png").convert()
+        self._clock = pygame.time.Clock()
     def on_input_focus(self):
         pass
     def on_input_blur(self):
@@ -27,11 +31,22 @@ class App:
         print("key down...")
         print(event)
         if event.key == pygame.K_LEFT:
-            self._star_position_x -= 1
+            self._star_velocity_x = -2
         if event.key == pygame.K_RIGHT:
-            self._star_position_x += 1
+            self._star_velocity_x = 2
+        if event.key == pygame.K_UP:
+            self._star_velocity_y = -2
+        if event.key == pygame.K_DOWN:
+            self._star_velocity_y = 2            
     def on_key_up(self, event):
-        pass
+        if event.key == pygame.K_LEFT:
+            self._star_velocity_x = 0
+        if event.key == pygame.K_RIGHT:
+            self._star_velocity_x = 0
+        if event.key == pygame.K_UP:
+            self._star_velocity_y = 0
+        if event.key == pygame.K_DOWN:
+            self._star_velocity_y = 0   
     def on_mouse_focus(self):
         pass
     def on_mouse_blur(self):
@@ -131,7 +146,10 @@ class App:
                     self.on_minimize()
 
     def on_loop(self):
-        pass
+        self._star_position_x += self._star_velocity_x
+        self._star_position_y += self._star_velocity_y
+        self._clock.tick(60) 
+
     def on_render(self):
             self._display_surf.blit(self._image_surf,(self._star_position_x, self._star_position_y))
             pygame.display.flip()
