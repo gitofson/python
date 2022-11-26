@@ -45,6 +45,13 @@ class Snake:
         #draw apple
         surface.blit(self._image_apple, self._apple_position)
         #draw snake
+        cnt = 0
+        for p in self._body:
+            if cnt == 0:
+                surface.blit(self._image_head, p)
+            else:
+                surface.blit(self._image_body, p)
+            cnt += 1
 
 class App:
     B_WIDTH  = 300
@@ -96,6 +103,7 @@ class App:
         self._clock.tick(60) 
 
     def on_render(self):
+            pygame.draw.rect(self._display_surf, (0xff, 0xff, 0xff), pygame.Rect(0, 0, App.B_WIDTH, App.B_HEIGHT))
             self._snake.draw(self._display_surf)
             pygame.display.flip()
     def on_cleanup(self):
