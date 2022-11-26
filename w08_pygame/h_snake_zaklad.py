@@ -33,7 +33,7 @@ class Snake:
 
     def init_snake(self):
         for z in range(Snake.N_DOTS):
-            self._body.append((50 - z * 10, 50))
+            self._body.append([50 - z * 10, 50])
         self._image_head = pygame.image.load("../resources/head.png").convert()
         self._image_body = pygame.image.load("../resources/dot.png").convert()
         self._image_apple = pygame.image.load("../resources/apple.png").convert()
@@ -53,15 +53,17 @@ class Snake:
                 surface.blit(self._image_body, p)
             cnt += 1
     def move(self):
-        self._body = [(self._body[0][0], self._body[0][1])] + self._body
+        self._body = [[self._body[0][0], self._body[0][1]]] + self._body[:-1]
+        print(self._body[0][0])
         if self._movement == Movement.LEFT:
             self._body[0][0] -= Snake.DOT_SIZE
         elif self._movement == Movement.RIGHT:
             self._body[0][0] += Snake.DOT_SIZE
         elif self._movement == Movement.UP:
-            self._body[0][1] += Snake.DOT_SIZE
+            self._body[0][1] -= Snake.DOT_SIZE
         elif self._movement == Movement.DOWN:
             self._body[0][1] += Snake.DOT_SIZE
+        print(self._body)
     def set_movement(self, mvmt):
         self._movement = mvmt
 
@@ -85,13 +87,11 @@ class App:
         # nastavení velikosti okna, pokus o nastavení HW akcelerace, pokud nelze, použije se DOUBLEBUF
         self._display_surf = pygame.display.set_mode(self.size, pygame.HWSURFACE | pygame.DOUBLEBUF)
         self._running = True
-        self._clock = pygame.time.Clock()
         self._snake.init_snake()
+        self._clock = pygame.time.Clock()
     def on_input_focus(self):
         pass
     def on_key_down(self, event):
-        print("key down...")
-        print(event)
         if event.key == pygame.K_LEFT:
             self._snake.set_movement(Movement.LEFT)
         if event.key == pygame.K_RIGHT:
@@ -99,7 +99,8 @@ class App:
         if event.key == pygame.K_UP:
             self._snake.set_movement(Movement.UP)
         if event.key == pygame.K_DOWN:
-            self._snake.set_movement(Movement.DOWN)          
+            self._snake.set_movement(Movement.DOWN)
+        print(self._snake._movement)
     def on_key_up(self, event):
         pass
     def on_event(self, event):
@@ -112,8 +113,7 @@ class App:
             self.on_key_down(event)
 
     def on_loop(self):
-        self._snake.move
-        self._clock.tick(250) 
+        self._snake.move() 
 
     def on_render(self):
             pygame.draw.rect(self._display_surf, (0xff, 0xff, 0xff), pygame.Rect(0, 0, App.B_WIDTH, App.B_HEIGHT))
@@ -131,6 +131,7 @@ class App:
                 self.on_event(event)
             self.on_loop()
             self.on_render()
+            self._clock.tick(6)
         self.on_cleanup()
  
 if __name__ == "__main__" :
