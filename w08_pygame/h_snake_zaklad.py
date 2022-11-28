@@ -33,13 +33,14 @@ class Snake:
 
     def init_snake(self):
         for z in range(Snake.N_DOTS):
-            self._body.append((50 - z * 10, 50))
+            self._body.append((50 - z * Snake.DOT_SIZE, 50))
         self._image_head = pygame.image.load("../resources/head.png").convert()
         self._image_body = pygame.image.load("../resources/dot.png").convert()
         self._image_apple = pygame.image.load("../resources/apple.png").convert()
 
     def _respawn_apple(self):
-        self._apple_position = (randrange(Snake.APPLE_MAX_POS), randrange(Snake.APPLE_MAX_POS))
+        self._apple_position = [randrange(Snake.APPLE_MAX_POS)*Snake.DOT_SIZE,
+                                randrange(Snake.APPLE_MAX_POS)*Snake.DOT_SIZE]
     
     def draw(self, surface):
         #draw apple
