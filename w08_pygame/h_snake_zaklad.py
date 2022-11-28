@@ -9,8 +9,9 @@
 # 2. animace hada,
 # 3. prodloužední hada při konzumaci jablka,
 # 4. počítadlo score,
-# 5. konec hry při kolizi hlavičky hada s tělem, či hranicí herní plochy,
-# 6. GAME OVER obrazovka s dosaženým score.
+# 5. změna (zvýšení) rychlosti (framerate) hry po snězení N jablek, 
+# 6. konec hry při kolizi hlavičky hada s tělem, či hranicí herní plochy,
+# 7. GAME OVER obrazovka s dosaženým score.
 import pygame
 from enum import Enum
 from pygame.locals import *
