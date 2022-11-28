@@ -1,3 +1,9 @@
+# 1. vykreslit hada,
+# 2. animace hada,
+# 3. prodloužední hada při konzumaci jablka,
+# 4. počítadlo score,
+# 5. konec hry při kolizi hlavičky hada s tělem, či hranicí herní plochy,
+# 6. GAME OVER obrazovka s dosaženým score.
 import pygame
 from enum import Enum
 from pygame.locals import *
