@@ -29,7 +29,7 @@ class App:
         # vykreslení obdelníku červenou barvou čárou tloušťky 10
         pygame.draw.rect(self._display_surf, color, pygame.Rect(100, 40, 50, 50), 10)
         # Metoda flip zobrazí obrázek z paměti na obrazovku
-        pygame.display.flip()
+        pygame.display.update()
  
     def on_cleanup(self):
         pygame.quit()

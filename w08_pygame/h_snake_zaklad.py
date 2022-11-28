@@ -29,17 +29,19 @@ class Snake:
         self._image_body = None
         # jablko
         self._image_apple = None
+        # došlo ke konzumaci jablka
+        self._apple_consumed = True
 
 
     def init_snake(self):
         for z in range(Snake.N_DOTS):
-            self._body.append([50 - z * 10, 50])
+            self._body.append([50 - z * Snake.DOT_SIZE, 50])
         self._image_head = pygame.image.load("../resources/head.png").convert()
         self._image_body = pygame.image.load("../resources/dot.png").convert()
         self._image_apple = pygame.image.load("../resources/apple.png").convert()
 
     def _respawn_apple(self):
-        self._apple_position = (randrange(Snake.APPLE_MAX_POS), randrange(Snake.APPLE_MAX_POS))
+        self._apple_position = (randrange(Snake.APPLE_MAX_POS)*Snake.DOT_SIZE, randrange(Snake.APPLE_MAX_POS)*Snake.DOT_SIZE)
     
     def draw(self, surface):
         #draw apple
@@ -53,7 +55,11 @@ class Snake:
                 surface.blit(self._image_body, p)
             cnt += 1
     def move(self):
-        self._body = [[self._body[0][0], self._body[0][1]]] + self._body[:-1]
+        tail = self._body[:-1]
+        if self._apple_consumed:
+            tail = self._body
+            self._apple_consumed = False
+        self._body = [[self._body[0][0], self._body[0][1]]] + tail
         print(self._body[0][0])
         if self._movement == Movement.LEFT:
             self._body[0][0] -= Snake.DOT_SIZE
@@ -63,7 +69,14 @@ class Snake:
             self._body[0][1] -= Snake.DOT_SIZE
         elif self._movement == Movement.DOWN:
             self._body[0][1] += Snake.DOT_SIZE
-        print(self._body)
+        #print(self._body)
+        
+    def check_apple_colision(self):
+        print(self._apple_position, self._body[0])
+        if self._apple_position == tuple(self._body[0]):
+            self._apple_consumed = True
+            self._respawn_apple()
+            
     def set_movement(self, mvmt):
         self._movement = mvmt
 
@@ -113,7 +126,8 @@ class App:
             self.on_key_down(event)
 
     def on_loop(self):
-        self._snake.move() 
+        self._snake.move()
+        self._snake.check_apple_colision()
 
     def on_render(self):
             pygame.draw.rect(self._display_surf, (0xff, 0xff, 0xff), pygame.Rect(0, 0, App.B_WIDTH, App.B_HEIGHT))
