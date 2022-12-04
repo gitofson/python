@@ -75,9 +75,13 @@ class Snake:
             or self._body[0][1] == App().height + Snake.DOT_SIZE
             or self._body[0] in self._body[1:]):
             self._running = False
+
     def _respawn_apple(self):
-        self._apple_position = [randrange(Snake.APPLE_MAX_POS)*Snake.DOT_SIZE,
-                                randrange(Snake.APPLE_MAX_POS)*Snake.DOT_SIZE]
+        while True:
+            self._apple_position = [randrange(Snake.APPLE_MAX_POS)*Snake.DOT_SIZE,
+                                    randrange(Snake.APPLE_MAX_POS)*Snake.DOT_SIZE]
+            if self._apple_position not in self._body:
+                break
     
     def draw(self, surface):
         #draw apple
@@ -87,8 +91,12 @@ class Snake:
             
         for i in range(len(self._body) - 1):
             surface.blit(self._image_body, self._body[i + 1])
+
     def setMovement(self, movement):
         self._movement = movement
+    
+    def getScore(self):
+        return len(self._body) - Snake.N_DOTS
 
 class App:
     B_WIDTH  = 300
@@ -130,8 +138,8 @@ class App:
         self._display_surf.fill((0, 0, 0))
         font = pygame.font.SysFont("Arial", 50)
         font2 = pygame.font.SysFont("Arial", 20)
-        render = font.render("PROHRA", 1, (255, 0, 0))
-        render2 = font2.render(f"Skóre: {len(self._snake._body) - Snake.N_DOTS}", 1, (0, 255, 0))
+        render = font.render("Game Over", 1, (255, 0, 0))
+        render2 = font2.render("Score: {}".format(self._snake.getScore()), 1, (0, 255, 0))
         self._display_surf.blit(render, (self.B_WIDTH/2 - render.get_width()/2, self.B_WIDTH/2 - render.get_height()/2))
         self._display_surf.blit(render2, (self.B_WIDTH/2 - render2.get_width()/2, self.B_WIDTH/2 - render2.get_height()/2 + 35))
         pygame.display.flip()
