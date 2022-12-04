@@ -5,13 +5,11 @@
 # The objective is to eat as many apples as possible. Each time the snake eats an apple its body grows.
 # The snake must avoid the walls and its own body. This game is sometimes called Nibbles.
 
-# 1. Vykreslit hada,
-# 2. animace hada,
-# 3. prodloužední hada při konzumaci jablka,
-# 4. počítadlo score,
-# 5. změna (zvýšení) rychlosti (framerate) hry po snězení N jablek, 
-# 6. konec hry při kolizi hlavičky hada s tělem, či hranicí herní plochy,
-# 7. GAME OVER obrazovka s dosaženým score.
+# 1. pomocí 2 obdelníků rozdělte obrazovku na herní část a informační část (score, speed, level),
+# 2. v informační části zobrazte aktuální score, speed a level,
+# 3. po snědení N jablek zvyšte rychlost hry,
+# 4. připravte další 2 úrovně hry v podobě zvyšujícího se počtu překážek (seznam seznamů seznamu bodů),
+# 5. naprogramujte hru tak, aby s překážkami bylo v kolizích počítáno.
 import pygame
 from enum import Enum
 from pygame.locals import *
@@ -55,14 +53,15 @@ class Snake:
         self._image_body = pygame.image.load("../resources/dot.png").convert()
         self._image_apple = pygame.image.load("../resources/apple.png").convert()
     def pohyb(self, movement):
+        head = [self._body[0][0], self._body[0][1]]
         if movement == Movement.LEFT:
-            head = [self._body[0][0] - 10, self._body[0][1]]
+            head[0] -= Snake.DOT_SIZE
         if movement == Movement.RIGHT:
-            head = [self._body[0][0] + 10, self._body[0][1]]
+            head[0] += Snake.DOT_SIZE
         if movement == Movement.UP:
-            head = [self._body[0][0], self._body[0][1] - 10]
+            head[1] -= Snake.DOT_SIZE
         if movement == Movement.DOWN:
-            head = [self._body[0][0], self._body[0][1] + 10]
+            head[1] += Snake.DOT_SIZE
         if head == self._apple_position:
             self._body = [head] + self._body
             self._respawn_apple()
@@ -71,9 +70,9 @@ class Snake:
     def is_collided(self):
         # S koncem obrazovky
         if (self._body[0][0] == -Snake.DOT_SIZE
-            or self._body[1][0] == App().width
+            or self._body[0][0] == App().width + Snake.DOT_SIZE
             or self._body[0][1] == -Snake.DOT_SIZE
-            or self._body[1][1] == App().height
+            or self._body[0][1] == App().height + Snake.DOT_SIZE
             or self._body[0] in self._body[1:]):
             self._running = False
     def _respawn_apple(self):
@@ -81,7 +80,6 @@ class Snake:
                                 randrange(Snake.APPLE_MAX_POS)*Snake.DOT_SIZE]
     
     def draw(self, surface):
-        surface.fill((255, 255, 255))
         #draw apple
         surface.blit(self._image_apple, self._apple_position)
         #draw snake
@@ -89,6 +87,9 @@ class Snake:
             
         for i in range(len(self._body) - 1):
             surface.blit(self._image_body, self._body[i + 1])
+    def setMovement(self, movement):
+        self._movement = movement
+
 class App:
     B_WIDTH  = 300
     B_HEIGHT = 300
@@ -110,14 +111,15 @@ class App:
     def on_input_focus(self):
         pass
     def on_key_down(self, event):
-        if event.key == pygame.K_LEFT and self._snake._movement != Movement.RIGHT:
-            self._snake._movement = Movement.LEFT
-        if event.key == pygame.K_RIGHT and self._snake._movement != Movement.LEFT:
-            self._snake._movement = Movement.RIGHT
-        if event.key == pygame.K_UP and self._snake._movement != Movement.DOWN:
-            self._snake._movement = Movement.UP
-        if event.key == pygame.K_DOWN and self._snake._movement != Movement.UP:
-            self._snake._movement = Movement.DOWN
+        if event.key == pygame.K_LEFT:
+            self._snake.setMovement(Movement.LEFT)
+        if event.key == pygame.K_RIGHT:
+            self._snake.setMovement(Movement.RIGHT)
+        if event.key == pygame.K_UP:
+            self._snake.setMovement(Movement.UP)
+        if event.key == pygame.K_DOWN:
+            self._snake.setMovement(Movement.DOWN)
+
     def on_event(self, event):
         if event.type == QUIT:
             self._running = False
@@ -125,20 +127,24 @@ class App:
             self.on_key_down(event)
     def game_over(self):
         pygame.font.init()
-        self._display_surf.fill((255, 255, 255))
+        self._display_surf.fill((0, 0, 0))
         font = pygame.font.SysFont("Arial", 50)
         font2 = pygame.font.SysFont("Arial", 20)
-        render = font.render("PROHRA", 1, (0, 0, 0))
-        render2 = font2.render(f"Skóre: {len(self._snake._body) - Snake.N_DOTS}", 1, (0, 0, 0))
+        render = font.render("PROHRA", 1, (255, 0, 0))
+        render2 = font2.render(f"Skóre: {len(self._snake._body) - Snake.N_DOTS}", 1, (0, 255, 0))
         self._display_surf.blit(render, (self.B_WIDTH/2 - render.get_width()/2, self.B_WIDTH/2 - render.get_height()/2))
         self._display_surf.blit(render2, (self.B_WIDTH/2 - render2.get_width()/2, self.B_WIDTH/2 - render2.get_height()/2 + 35))
         pygame.display.flip()
-        time.sleep(5)
+        while True:
+            for event in pygame.event.get():
+                if event.type == KEYDOWN and event.key == pygame.K_SPACE:
+                    self.on_cleanup()
     def on_loop(self):
         self._clock.tick(8)
         self._snake.pohyb(self._snake._movement)
         self._snake.is_collided()
     def on_render(self):
+            self._display_surf.fill((0, 0, 0))
             self._snake.draw(self._display_surf)
             pygame.display.flip()
     def on_cleanup(self):
@@ -148,14 +154,14 @@ class App:
         # had
         self._snake.init_snake()
         # game loop
-        while(self._running and self._snake._running):
+        while self._snake._running:
             # zpracování všech typů událostí
             for event in pygame.event.get():
                 self.on_event(event)
             self.on_loop()
             self.on_render()
         self.game_over()
-        self.on_cleanup()
+
  
 if __name__ == "__main__" :
     theApp = App()
