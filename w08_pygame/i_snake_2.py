@@ -70,9 +70,9 @@ class Snake:
     def is_collided(self):
         # S koncem obrazovky
         if (self._body[0][0] == -Snake.DOT_SIZE
-            or self._body[0][0] == App().width + Snake.DOT_SIZE
+            or self._body[0][0] == App.B_WIDTH + Snake.DOT_SIZE
             or self._body[0][1] == -Snake.DOT_SIZE
-            or self._body[0][1] == App().height + Snake.DOT_SIZE
+            or self._body[0][1] == App.B_HEIGHT + Snake.DOT_SIZE
             or self._body[0] in self._body[1:]):
             self._running = False
 

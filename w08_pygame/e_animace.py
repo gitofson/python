@@ -18,6 +18,9 @@ class App:
         self._running = True
         # načtení obrázku
         self._image_surf = pygame.image.load("../resources/star.png").convert()
+        # použití metod pro zjištění šířky a výšky obrázku:
+        # self._image_surf.get_width()
+        # self._image_surf.get_height()
  
     def on_event(self, event):
         if event.type == QUIT:
