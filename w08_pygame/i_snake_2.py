@@ -100,15 +100,37 @@ class App:
         self._snake = Snake()
         self.size = self.width, self.height = App.B_WIDTH, App.B_HEIGHT
         self._clock = None
+        self._level = 1
+        self._menu = True
 
         # inicializace PyGame modulů
         pygame.init()
+        pygame.font.init()
         # nastavení velikosti okna, pokus o nastavení HW akcelerace, pokud nelze, použije se DOUBLEBUF
         self._display_surf = pygame.display.set_mode(self.size, pygame.HWSURFACE | pygame.DOUBLEBUF)
+        self._display_surf.fill((255, 255, 255))
         self._running = True
         self._clock = pygame.time.Clock()
     def on_input_focus(self):
         pass
+    def UI(self):
+        font = pygame.font.SysFont("Arial", 20)
+        render = font.render(f"Skóre: {len(self._snake._body) - Snake.N_DOTS}    Level: {self._level}", 1, (0, 0, 0))
+        self._display_surf.blit(render, (self.B_WIDTH/2 - render.get_width()/2, self.B_WIDTH - render.get_height() - 280))
+    def menu(self):
+        pygame.font.init()
+        self._display_surf.fill((255, 255, 255))
+        font = pygame.font.SysFont("Arial", 70)
+        font2 = pygame.font.SysFont("Arial", 35)
+        nazev = font.render("Snake", 1, (0, 0, 0))
+        render_levelu = [font2.render(f"Level {i}", 1, (0, 0, 0)) for i in range(1, 5)]
+        self._display_surf.blit(nazev, (self.B_WIDTH/2 - nazev.get_width()/2, self.B_HEIGHT - nazev.get_height() - 220))
+        for i in range(3):
+            self._display_surf.blit(render_levelu[i], (self.B_WIDTH - render_levelu[i].get_width()/2 - (220 if i % 2 == 0 else 80), self.B_HEIGHT/4 - render_levelu[i].get_height()/2 + (35 if i <= 1 else 85)))
+        #self._display_surf.blit(render_levelu[1], (self.B_WIDTH - render_levelu[1].get_width()/2 - 80, self.B_HEIGHT/4 - render_levelu[1].get_height()/2 + 35))
+        #self._display_surf.blit(render_levelu[2], (self.B_WIDTH - render_levelu[2].get_width()/2 - 220, self.B_HEIGHT/4 - render_levelu[2].get_height()/2 + 85))
+        #self._display_surf.blit(render_levelu[3], (self.B_WIDTH - render_levelu[3].get_width()/2 - 80, self.B_HEIGHT/4 - render_levelu[3].get_height()/2 + 85))
+        pygame.display.flip()
     def on_key_down(self, event):
         if event.key == pygame.K_LEFT and self._snake._movement != Movement.RIGHT:
             self._snake._movement = Movement.LEFT
@@ -118,10 +140,14 @@ class App:
             self._snake._movement = Movement.UP
         if event.key == pygame.K_DOWN and self._snake._movement != Movement.UP:
             self._snake._movement = Movement.DOWN
-    def on_event(self, event):
+    def on_event(self, event, mouse):
         if event.type == QUIT:
             self._running = False
-        elif event.type == KEYDOWN:
+        elif event.type == MOUSEBUTTONDOWN:
+            if 25 <= mouse[0] <= 130 and 100 <= mouse[1] <= 120 and self._menu:
+                self._menu = False
+                self._snake.init_snake()
+        elif event.type == KEYDOWN and not self._menu:
             self.on_key_down(event)
     def game_over(self):
         pygame.font.init()
@@ -130,8 +156,8 @@ class App:
         font2 = pygame.font.SysFont("Arial", 20)
         render = font.render("PROHRA", 1, (0, 0, 0))
         render2 = font2.render(f"Skóre: {len(self._snake._body) - Snake.N_DOTS}", 1, (0, 0, 0))
-        self._display_surf.blit(render, (self.B_WIDTH/2 - render.get_width()/2, self.B_WIDTH/2 - render.get_height()/2))
-        self._display_surf.blit(render2, (self.B_WIDTH/2 - render2.get_width()/2, self.B_WIDTH/2 - render2.get_height()/2 + 35))
+        self._display_surf.blit(render, (self.B_WIDTH/2 - render.get_width()/2, self.B_HEIGHT/2 - render.get_height()/2))
+        self._display_surf.blit(render2, (self.B_WIDTH/2 - render2.get_width()/2, self.B_HEIGHT/2 - render2.get_height()/2 + 35))
         pygame.display.flip()
         time.sleep(5)
     def on_loop(self):
@@ -140,21 +166,25 @@ class App:
         self._snake.is_collided()
     def on_render(self):
             self._snake.draw(self._display_surf)
+            self.UI()
             pygame.display.flip()
     def on_cleanup(self):
         pygame.quit()
  
     def on_execute(self):
-        # had
-        self._snake.init_snake()
         # game loop
         while(self._running and self._snake._running):
             # zpracování všech typů událostí
             for event in pygame.event.get():
-                self.on_event(event)
-            self.on_loop()
-            self.on_render()
-        self.game_over()
+                mouse = pygame.mouse.get_pos()
+                self.on_event(event, mouse)
+            if not self._menu:
+                self.on_loop()
+                self.on_render()
+            else:
+                self.menu()
+        if not self._menu:
+            self.game_over()
         self.on_cleanup()
  
 if __name__ == "__main__" :
