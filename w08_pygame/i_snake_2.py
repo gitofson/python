@@ -71,9 +71,9 @@ class Snake:
     def is_collided(self):
         # S koncem obrazovky
         if (self._body[0][0] == -Snake.DOT_SIZE
-            or self._body[1][0] == App().width
+            or self._body[1][0] == App.B_WIDTH
             or self._body[0][1] == -Snake.DOT_SIZE
-            or self._body[1][1] == App().height
+            or self._body[1][1] == App.B_HEIGHT
             or self._body[0] in self._body[1:]):
             self._running = False
     def _respawn_apple(self):
@@ -101,6 +101,7 @@ class App:
         self.size = self.width, self.height = App.B_WIDTH, App.B_HEIGHT
         self._clock = None
         self._level = 1
+        self._levels = [None, 10, 20, 35, 55, 75, 90, 100]
         self._menu = True
 
         # inicializace PyGame modulů
@@ -118,15 +119,16 @@ class App:
         render = font.render(f"Skóre: {len(self._snake._body) - Snake.N_DOTS}    Level: {self._level}", 1, (0, 0, 0))
         self._display_surf.blit(render, (self.B_WIDTH/2 - render.get_width()/2, self.B_WIDTH - render.get_height() - 280))
     def menu(self):
-        pygame.font.init()
         self._display_surf.fill((255, 255, 255))
         font = pygame.font.SysFont("Arial", 70)
         font2 = pygame.font.SysFont("Arial", 35)
         nazev = font.render("Snake", 1, (0, 0, 0))
+        ukoncit = font2.render("Ukončit", 1, (0, 0, 0))
         render_levelu = [font2.render(f"Level {i}", 1, (0, 0, 0)) for i in range(1, 5)]
         self._display_surf.blit(nazev, (self.B_WIDTH/2 - nazev.get_width()/2, self.B_HEIGHT - nazev.get_height() - 220))
         for i in range(4):
             self._display_surf.blit(render_levelu[i], (self.B_WIDTH - render_levelu[i].get_width()/2 - (220 if i % 2 == 0 else 80), self.B_HEIGHT/4 - render_levelu[i].get_height()/2 + (35 if i <= 1 else 85)))
+        self._display_surf.blit(ukoncit, (self.B_WIDTH/2 - ukoncit.get_width()/2, self.B_HEIGHT - ukoncit.get_height() - 50))
         pygame.display.flip()
     def on_key_down(self, event):
         if event.key == pygame.K_LEFT and self._snake._movement != Movement.RIGHT:
@@ -146,21 +148,24 @@ class App:
                 self._snake.init_snake()
         elif event.type == KEYDOWN and not self._menu:
             self.on_key_down(event)
-    def game_over(self):
-        pygame.font.init()
+    def konec(self, text, skore):
         self._display_surf.fill((255, 255, 255))
         font = pygame.font.SysFont("Arial", 50)
         font2 = pygame.font.SysFont("Arial", 20)
-        render = font.render("PROHRA", 1, (0, 0, 0))
-        render2 = font2.render(f"Skóre: {len(self._snake._body) - Snake.N_DOTS}", 1, (0, 0, 0))
+        render = font.render(f"{text}", 1, (0, 0, 0))
+        render2 = font2.render(f"Skóre: {skore}" if text == "PROHRA" else f" {self._level}. level dokončen!", 1, (0, 0, 0))
         self._display_surf.blit(render, (self.B_WIDTH/2 - render.get_width()/2, self.B_HEIGHT/2 - render.get_height()/2))
         self._display_surf.blit(render2, (self.B_WIDTH/2 - render2.get_width()/2, self.B_HEIGHT/2 - render2.get_height()/2 + 35))
         pygame.display.flip()
         time.sleep(5)
-    def on_loop(self):
+        self._menu = True
+        start()
+    def on_loop(self, skore):
         self._clock.tick(8)
         self._snake.pohyb(self._snake._movement)
         self._snake.is_collided()
+        if skore == self._levels[self._level]:
+            self.konec("VÝHRA", skore)
     def on_render(self):
             self._snake.draw(self._display_surf)
             self.UI()
@@ -176,14 +181,16 @@ class App:
                 mouse = pygame.mouse.get_pos()
                 self.on_event(event, mouse)
             if not self._menu:
-                self.on_loop()
+                skore = len(self._snake._body) - Snake.N_DOTS
+                self.on_loop(skore)
                 self.on_render()
             else:
                 self.menu()
         if not self._menu:
-            self.game_over()
+            self.konec("PROHRA", skore)
         self.on_cleanup()
- 
-if __name__ == "__main__" :
+def start():
     theApp = App()
     theApp.on_execute()
+if __name__ == "__main__":
+    start()
