@@ -5,13 +5,11 @@
 # The objective is to eat as many apples as possible. Each time the snake eats an apple its body grows.
 # The snake must avoid the walls and its own body. This game is sometimes called Nibbles.
 
-# 1. Vykreslit hada,
-# 2. animace hada,
-# 3. prodloužední hada při konzumaci jablka,
-# 4. počítadlo score,
-# 5. změna (zvýšení) rychlosti (framerate) hry po snězení N jablek, 
-# 6. konec hry při kolizi hlavičky hada s tělem, či hranicí herní plochy,
-# 7. GAME OVER obrazovka s dosaženým score.
+# 1. pomocí 2 obdelníků rozdělte obrazovku na herní část a informační část (score, speed, level),
+# 2. v informační části zobrazte aktuální score, speed a level,
+# 3. po snědení N jablek zvyšte rychlost hry,
+# 4. připravte další 2 úrovně hry v podobě zvyšujícího se počtu překážek (seznam seznamů seznamu bodů),
+# 5. naprogramujte hru tak, aby s překážkami bylo v kolizích počítáno.
 import pygame
 from enum import Enum
 from pygame.locals import *
@@ -55,14 +53,15 @@ class Snake:
         self._image_body = pygame.image.load("../resources/dot.png").convert()
         self._image_apple = pygame.image.load("../resources/apple.png").convert()
     def pohyb(self, movement):
+        head = [self._body[0][0], self._body[0][1]]
         if movement == Movement.LEFT:
-            head = [self._body[0][0] - 10, self._body[0][1]]
+            head[0] -= Snake.DOT_SIZE
         if movement == Movement.RIGHT:
-            head = [self._body[0][0] + 10, self._body[0][1]]
+            head[0] += Snake.DOT_SIZE
         if movement == Movement.UP:
-            head = [self._body[0][0], self._body[0][1] - 10]
+            head[1] -= Snake.DOT_SIZE
         if movement == Movement.DOWN:
-            head = [self._body[0][0], self._body[0][1] + 10]
+            head[1] += Snake.DOT_SIZE
         if head == self._apple_position:
             self._body = [head] + self._body
             self._respawn_apple()
@@ -76,12 +75,15 @@ class Snake:
             or self._body[1][1] == App.B_HEIGHT
             or self._body[0] in self._body[1:]):
             self._running = False
+
     def _respawn_apple(self):
-        self._apple_position = [randrange(Snake.APPLE_MAX_POS)*Snake.DOT_SIZE,
-                                randrange(Snake.APPLE_MAX_POS)*Snake.DOT_SIZE]
+        while True:
+            self._apple_position = [randrange(Snake.APPLE_MAX_POS)*Snake.DOT_SIZE,
+                                    randrange(Snake.APPLE_MAX_POS)*Snake.DOT_SIZE]
+            if self._apple_position not in self._body:
+                break
     
     def draw(self, surface):
-        surface.fill((255, 255, 255))
         #draw apple
         surface.blit(self._image_apple, self._apple_position)
         #draw snake
@@ -89,6 +91,13 @@ class Snake:
             
         for i in range(len(self._body) - 1):
             surface.blit(self._image_body, self._body[i + 1])
+
+    def setMovement(self, movement):
+        self._movement = movement
+    
+    def getScore(self):
+        return len(self._body) - Snake.N_DOTS
+
 class App:
     B_WIDTH  = 300
     B_HEIGHT = 300
@@ -167,6 +176,7 @@ class App:
         if skore == self._levels[self._level]:
             self.konec("VÝHRA", skore)
     def on_render(self):
+            self._display_surf.fill((0, 0, 0))
             self._snake.draw(self._display_surf)
             self.UI()
             pygame.display.flip()
@@ -175,7 +185,7 @@ class App:
  
     def on_execute(self):
         # game loop
-        while(self._running and self._snake._running):
+        while self._snake._running:
             # zpracování všech typů událostí
             for event in pygame.event.get():
                 mouse = pygame.mouse.get_pos()
