@@ -127,9 +127,6 @@ class App:
         self._display_surf.blit(nazev, (self.B_WIDTH/2 - nazev.get_width()/2, self.B_HEIGHT - nazev.get_height() - 220))
         for i in range(4):
             self._display_surf.blit(render_levelu[i], (self.B_WIDTH - render_levelu[i].get_width()/2 - (220 if i % 2 == 0 else 80), self.B_HEIGHT/4 - render_levelu[i].get_height()/2 + (35 if i <= 1 else 85)))
-        #self._display_surf.blit(render_levelu[1], (self.B_WIDTH - render_levelu[1].get_width()/2 - 80, self.B_HEIGHT/4 - render_levelu[1].get_height()/2 + 35))
-        #self._display_surf.blit(render_levelu[2], (self.B_WIDTH - render_levelu[2].get_width()/2 - 220, self.B_HEIGHT/4 - render_levelu[2].get_height()/2 + 85))
-        #self._display_surf.blit(render_levelu[3], (self.B_WIDTH - render_levelu[3].get_width()/2 - 80, self.B_HEIGHT/4 - render_levelu[3].get_height()/2 + 85))
         pygame.display.flip()
     def on_key_down(self, event):
         if event.key == pygame.K_LEFT and self._snake._movement != Movement.RIGHT:
