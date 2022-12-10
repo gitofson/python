@@ -125,7 +125,7 @@ class App:
         nazev = font.render("Snake", 1, (0, 0, 0))
         render_levelu = [font2.render(f"Level {i}", 1, (0, 0, 0)) for i in range(1, 5)]
         self._display_surf.blit(nazev, (self.B_WIDTH/2 - nazev.get_width()/2, self.B_HEIGHT - nazev.get_height() - 220))
-        for i in range(3):
+        for i in range(4):
             self._display_surf.blit(render_levelu[i], (self.B_WIDTH - render_levelu[i].get_width()/2 - (220 if i % 2 == 0 else 80), self.B_HEIGHT/4 - render_levelu[i].get_height()/2 + (35 if i <= 1 else 85)))
         #self._display_surf.blit(render_levelu[1], (self.B_WIDTH - render_levelu[1].get_width()/2 - 80, self.B_HEIGHT/4 - render_levelu[1].get_height()/2 + 35))
         #self._display_surf.blit(render_levelu[2], (self.B_WIDTH - render_levelu[2].get_width()/2 - 220, self.B_HEIGHT/4 - render_levelu[2].get_height()/2 + 85))
