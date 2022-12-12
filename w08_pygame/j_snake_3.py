@@ -5,6 +5,7 @@
 # The objective is to eat as many apples as possible. Each time the snake eats an apple its body grows.
 # The snake must avoid the walls and its own body. This game is sometimes called Nibbles.
 
+# 0. ošetřete respwn jablka tak, aby se nemohlo objevit v překážce.
 # 1. upravte pozice a tvary překážek tak, aby byla hra ještě lépe hratelná
 # 2. pomocí midi souborů zaveďtě do hry hudební doprovod (každý level jiná melodie)
 # 3. upravte hru tak, aby jí mohly hrát 2 hráči (po obrazovce jezdí 2 hadi)
