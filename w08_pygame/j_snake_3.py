@@ -36,7 +36,7 @@ class Snake:
             [[24,24], [25,24], [26,24]],
             [[13,12], [13,13], [13,14], [12,13], [14,13]]
         ]
-    def __init__(self):
+    def __init__(self, y_init):
         # body = tělo hada, reprezentované seznamem bodů (n-tic) jednotlivých stavebních kamenů o šířce Snake.DOT_SIZE
         self._body = []
         # aktuální pohyb
@@ -52,13 +52,15 @@ class Snake:
         self._image_apple = None
         # Snake running
         self._running = True
+        self._y_init = y_init
         
     def init_snake(self):
         for z in range(Snake.N_DOTS):
-            self._body.append([50 - z * Snake.DOT_SIZE, 50])
+            self._body.append([50 - z * Snake.DOT_SIZE, self._y_init])
         self._image_head = pygame.image.load("../resources/head.png").convert()
         self._image_body = pygame.image.load("../resources/dot.png").convert()
         self._image_apple = pygame.image.load("../resources/apple.png").convert()
+        
     def pohyb(self, movement):
         head = [self._body[0][0], self._body[0][1]]
         if movement == Movement.LEFT:
@@ -75,6 +77,7 @@ class Snake:
             App.speed += 0.5
             if App.speed >= App.SPEED_LEVEL_LIMIT:
                 App.level += 1
+                App.play_music()
                 App.speed = 8
         else:
             self._body = [head] + self._body[:-1]
@@ -97,7 +100,7 @@ class Snake:
         while True:
             self._apple_position = [randrange(1,Snake.APPLE_MAX_POS-1)*Snake.DOT_SIZE,
                                     randrange(int(App.SCORE_SCREEN_HEIGHT/Snake.DOT_SIZE + 1), Snake.APPLE_MAX_POS-1)*Snake.DOT_SIZE]
-            if self._apple_position not in self._body:
+            if self._apple_position not in self._body and self._apple_position not in sum(Snake.OBSTACLES[:App.level-1],[]):
                 break
 
     def draw_obstacles(self, surface):
@@ -134,12 +137,25 @@ class App:
     SPEED_LEVEL_LIMIT = 10
     speed = 8
     level = 1
+    d_level_mid = {
+        1: "../resources/tetris.mid",
+        2: "../resources/mortal_kombat.mid",
+        3: "../resources/popcorn.mid",
+        4: "../resources/beat_it.mid",
+    }
 
+    @staticmethod
+    def play_music():
+        pygame.mixer.music.stop()
+        pygame.mixer.music.load(App.d_level_mid.get(App.level))
+        pygame.mixer.music.play()
+        
     def __init__(self):
         # hra neskončena
         self._running = True 
         self._display_surf = None
-        self._snake = Snake()
+        self._snake = Snake(50)
+        self._snake2 = Snake(120)
         self.size = self.width, self.height = App.B_WIDTH, App.B_HEIGHT
         self._clock = None
 
@@ -149,6 +165,8 @@ class App:
         self._display_surf = pygame.display.set_mode(self.size, pygame.HWSURFACE | pygame.DOUBLEBUF)
         self._running = True
         self._clock = pygame.time.Clock()
+        App.play_music()
+        
     def on_input_focus(self):
         pass
     def on_key_down(self, event):
@@ -160,6 +178,14 @@ class App:
             self._snake.setMovement(Movement.UP)
         if event.key == pygame.K_DOWN:
             self._snake.setMovement(Movement.DOWN)
+        if event.key == pygame.K_a:
+            self._snake2.setMovement(Movement.LEFT)
+        if event.key == pygame.K_d:
+            self._snake2.setMovement(Movement.RIGHT)
+        if event.key == pygame.K_w:
+            self._snake2.setMovement(Movement.UP)
+        if event.key == pygame.K_s:
+            self._snake2.setMovement(Movement.DOWN)            
 
     def on_event(self, event):
         if event.type == QUIT:
@@ -167,6 +193,7 @@ class App:
         elif event.type == KEYDOWN:
             self.on_key_down(event)
     def game_over(self):
+        pygame.mixer.music.stop()
         pygame.font.init()
         self._display_surf.fill((0, 0, 0))
         font = pygame.font.SysFont("Arial", 50)
@@ -196,10 +223,13 @@ class App:
         self._clock.tick(App.speed)
         self._snake.pohyb(self._snake._movement)
         self._snake.is_collided()
+        self._snake2.pohyb(self._snake2._movement)
+        self._snake2.is_collided()
     def on_render(self):
             self._display_surf.fill((0, 0, 0))
             self.draw_score_screen()
             self._snake.draw(self._display_surf)
+            self._snake2.draw(self._display_surf)
             pygame.draw.rect(self._display_surf, (255,0,0), pygame.Rect(
                 0, App.SCORE_SCREEN_HEIGHT, App.B_WIDTH, App.B_HEIGHT-App.SCORE_SCREEN_HEIGHT), 10)
             pygame.display.flip()
@@ -209,6 +239,7 @@ class App:
     def on_execute(self):
         # had
         self._snake.init_snake()
+        self._snake2.init_snake()
         # game loop
         while self._snake._running:
             # zpracování všech typů událostí
