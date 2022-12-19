@@ -50,6 +50,7 @@ def service_connection(key, mask):
             # data nedorazila, což znamená, že klient socket zavřel. Zavřemo ho tedy i na straně serveru
         else:
             print(f"Closing connection to {data.addr}")
+            # odstranění z monitoringu selectů
             sel.unregister(sock)
             sock.close()
     if mask & selectors.EVENT_WRITE:
