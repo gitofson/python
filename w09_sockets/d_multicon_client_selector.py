@@ -36,7 +36,11 @@ def start_connections(host, port, num_conns):
         # registrace selektoru
         sel.register(sock, events, data=data)
         
-# key  - vlastní data (.data) a odkaz na socket (.fileobj)
+# key  - data (.data) - obsahuje mj. :
+#                       data.connid     - údaje o spojení
+#                       data.recv_total - počet 
+#                       data.msg_total  - počet
+#      - odkaz na socket (.fileobj)
 # mask - informace, jak má být s daty nakládáno. Hodnoty např. v konstantách 
 #        selectors.EVENT_READ, nebo selectors.EVENT_WRITE
 def service_connection(key, mask):
@@ -69,9 +73,7 @@ start_connections(host, int(port), int(num_conns))
 
 try:
     while True:
-        print("select beg.")
         events = sel.select(timeout=1)
-        print("select end")
         if events:
             for key, mask in events:
                 service_connection(key, mask)
