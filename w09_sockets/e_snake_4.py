@@ -1,14 +1,8 @@
 # inspirace: https://zetcode.com/javagames/snake/
 
-# Snake is an older classic video game. 
-# It was first created in late 70s. Later it was brought to PCs. In this game the player controls a snake. 
-# The objective is to eat as many apples as possible. Each time the snake eats an apple its body grows.
-# The snake must avoid the walls and its own body. This game is sometimes called Nibbles.
-
-# 0. ošetřete respwn jablka tak, aby se nemohlo objevit v překážce.
-# 1. upravte pozice a tvary překážek tak, aby byla hra ještě lépe hratelná
-# 2. pomocí midi souborů zaveďtě do hry hudební doprovod (každý level jiná melodie)
-# 3. upravte hru tak, aby jí mohly hrát 2 hráči (po obrazovce jezdí 2 hadi)
+# Vytvořte síťovou verzi hry snake. Zde jsou pozice jablka a instance hráčů uloženy ve statických proměnných třídy Snake. Pro picklink
+# (serializace dat pomocí nakládání) je však potřeba mít vše v objektu. Příklad s použitím nakládání zde:
+# ..\w07_oop\examples\Image.py
 
 import pygame
 from enum import Enum
@@ -21,6 +15,7 @@ class Movement(Enum):
     RIGHT  = 2 
     UP     = 3
     DOWN   = 4 
+
 
 
 class Snake:
@@ -88,13 +83,16 @@ class Snake:
         else:
             self._body = [head] + self._body[:-1]
     def is_collided(self):
+        # možné body kolize sám se sebou a spoluhráči
+        bodies = Snake.get_bodies()
+        bodies.remove(self._body[0])
         # S koncem obrazovky
         if (self._body[0][0] == 0
             or self._body[0][0] == App.B_WIDTH-Snake.DOT_SIZE
             or self._body[0][1] == App.SCORE_SCREEN_HEIGHT
             or self._body[0][1] == App.B_HEIGHT-Snake.DOT_SIZE
-            # sám se sebou
-            or self._body[0] in self._body[1:]
+            # sám se sebou, či s ostatními
+            or self._body[0] in bodies
             # s překážkami:
             or self._body[0] in map(
                 lambda p: [p[0] * Snake.DOT_SIZE, p[1] * Snake.DOT_SIZE], 
@@ -102,14 +100,18 @@ class Snake:
 
             self._running = False
     @staticmethod
-    def respawn_apple():
+    def get_bodies():
         bodies = []
         for snake in Snake.snakes:
             bodies += snake._body
+        return bodies
+    @staticmethod
+    def respawn_apple():
+
         while True:
             Snake.apple_position = [randrange(1,Snake.APPLE_MAX_POS-1)*Snake.DOT_SIZE,
                                     randrange(int(App.SCORE_SCREEN_HEIGHT/Snake.DOT_SIZE + 1), Snake.APPLE_MAX_POS-1)*Snake.DOT_SIZE]
-            if Snake.apple_position not in bodies and Snake.apple_position not in sum(Snake.OBSTACLES[:App.level-1],[]):
+            if Snake.apple_position not in Snake.get_bodies() and Snake.apple_position not in sum(Snake.OBSTACLES[:App.level-1],[]):
                 break
     @staticmethod
     def draw_obstacles(surface):
