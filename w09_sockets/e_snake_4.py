@@ -32,17 +32,14 @@ class Snake:
             [[24,24], [25,24], [26,24]],
             [[13,12], [13,13], [13,14], [12,13], [14,13]]
         ]
-    # instance hráčú
-    snakes = []
-    # pozice jablka
-    apple_position = []
-    def __init__(self, y_init):
+
+    def __init__(self, app, y_init):
         # body = tělo hada, reprezentované seznamem bodů (n-tic) jednotlivých stavebních kamenů o šířce Snake.DOT_SIZE
         self._body = []
         # aktuální pohyb
         self._movement = Movement.RIGHT
         
-        Snake.respawn_apple()
+        
         # hlava hada
         self._image_head = None
         # stav. kámen hada
@@ -52,8 +49,9 @@ class Snake:
         # Snake running
         self._running = True
         self._y_init = y_init
-
-        Snake.snakes.append(self)
+        self._app = app
+        self._app.respawn_apple()
+        self._app.snakes.append(self)
         
     def init_snake(self):
         for z in range(Snake.N_DOTS):
@@ -72,19 +70,19 @@ class Snake:
             head[1] -= Snake.DOT_SIZE
         if movement == Movement.DOWN:
             head[1] += Snake.DOT_SIZE
-        if head == Snake.apple_position:
+        if head == self._app.apple_position:
             self._body = [head] + self._body
-            Snake.respawn_apple()
-            App.speed += 0.5
-            if App.speed >= App.SPEED_LEVEL_LIMIT:
-                App.level += 1
-                App.play_music()
-                App.speed = 8
+            self._app.respawn_apple()
+            self._app.speed += 0.5
+            if self._app.speed >= App.SPEED_LEVEL_LIMIT:
+                self._app.level += 1
+                App.play_music(self._app.level)
+                self._app.speed = 8
         else:
             self._body = [head] + self._body[:-1]
     def is_collided(self):
         # možné body kolize sám se sebou a spoluhráči
-        bodies = Snake.get_bodies()
+        bodies = self._app.get_bodies()
         bodies.remove(self._body[0])
         # S koncem obrazovky
         if (self._body[0][0] == 0
@@ -96,29 +94,17 @@ class Snake:
             # s překážkami:
             or self._body[0] in map(
                 lambda p: [p[0] * Snake.DOT_SIZE, p[1] * Snake.DOT_SIZE], 
-                sum(Snake.OBSTACLES[:App.level-1],[]))):
+                sum(Snake.OBSTACLES[:self._app.level-1],[]))):
 
             self._running = False
-    @staticmethod
-    def get_bodies():
-        bodies = []
-        for snake in Snake.snakes:
-            bodies += snake._body
-        return bodies
-    @staticmethod
-    def respawn_apple():
 
-        while True:
-            Snake.apple_position = [randrange(1,Snake.APPLE_MAX_POS-1)*Snake.DOT_SIZE,
-                                    randrange(int(App.SCORE_SCREEN_HEIGHT/Snake.DOT_SIZE + 1), Snake.APPLE_MAX_POS-1)*Snake.DOT_SIZE]
-            if Snake.apple_position not in Snake.get_bodies() and Snake.apple_position not in sum(Snake.OBSTACLES[:App.level-1],[]):
-                break
-    @staticmethod
-    def draw_obstacles(surface):
+
+
+    def draw_obstacles(self, surface):
         cnt = 0
         for obstacle in Snake.OBSTACLES:
             cnt += 1
-            if cnt == App.level:
+            if cnt == self._app.level:
                 break
             for p in obstacle:
                 pygame.draw.rect(surface, (0,0,255), pygame.Rect(
@@ -127,11 +113,11 @@ class Snake:
 
     def draw(self, surface):
         #draw apple
-        surface.blit(self._image_apple, Snake.apple_position)
+        surface.blit(self._image_apple, self._app.apple_position)
         #draw snake
         surface.blit(self._image_head, self._body[0])
         #draw obstacles
-        Snake.draw_obstacles(surface)
+        self.draw_obstacles(surface)
         
         for i in range(len(self._body) - 1):
             surface.blit(self._image_body, self._body[i + 1])
@@ -146,8 +132,7 @@ class App:
     B_HEIGHT = 300
     SCORE_SCREEN_HEIGHT = 40
     SPEED_LEVEL_LIMIT = 10
-    speed = 8
-    level = 1
+
     d_level_mid = {
         1: "../resources/tetris.mid",
         2: "../resources/mortal_kombat.mid",
@@ -156,28 +141,49 @@ class App:
     }
 
     @staticmethod
-    def play_music():
+    def play_music(level):
         pygame.mixer.music.stop()
-        pygame.mixer.music.load(App.d_level_mid.get(App.level))
+        pygame.mixer.music.load(App.d_level_mid.get(level))
         pygame.mixer.music.play()
         
     def __init__(self):
+        # instance hráčú
+        self.snakes = []
+        # pozice jablka
+        self.apple_position = []
+
         # hra neskončena
         self._running = True 
         self._display_surf = None
-        self._snake = Snake(50)
-        self._snake2 = Snake(120)
+
         self.size = self.width, self.height = App.B_WIDTH, App.B_HEIGHT
         self._clock = None
-
+        self.speed = 8
+        self.level = 1
+        
         # inicializace PyGame modulů
         pygame.init()
         # nastavení velikosti okna, pokus o nastavení HW akcelerace, pokud nelze, použije se DOUBLEBUF
         self._display_surf = pygame.display.set_mode(self.size, pygame.HWSURFACE | pygame.DOUBLEBUF)
         self._running = True
         self._clock = pygame.time.Clock()
-        App.play_music()
+        self._snake = Snake(self, 50)
+        self._snake2 = Snake(self,120)
+        App.play_music(self.level)
+
         
+    def get_bodies(self):
+        bodies = []
+        for snake in self.snakes:
+            bodies += snake._body
+        return bodies
+
+    def respawn_apple(self):
+        while True:
+            self.apple_position = [randrange(1,Snake.APPLE_MAX_POS-1)*Snake.DOT_SIZE,
+                                    randrange(int(App.SCORE_SCREEN_HEIGHT/Snake.DOT_SIZE + 1), Snake.APPLE_MAX_POS-1)*Snake.DOT_SIZE]
+            if self.apple_position not in self.get_bodies() and self.apple_position not in sum(Snake.OBSTACLES[:self.level-1],[]):
+                break
     def on_input_focus(self):
         pass
     def on_key_down(self, event):
@@ -224,14 +230,14 @@ class App:
         render = font.render("Score: {}".format(self._snake.getScore()), 1, (255, 0, 0))
         self._display_surf.blit(render, (20, self.SCORE_SCREEN_HEIGHT/2 - render.get_height()/2))
         
-        render = font.render("Speed: {}".format(App.speed), 1, (0, 255, 0))
+        render = font.render("Speed: {}".format(self.speed), 1, (0, 255, 0))
         self._display_surf.blit(render, (100, self.SCORE_SCREEN_HEIGHT/2 - render.get_height()/2))
         
-        render = font.render("Level: {}".format(App.level), 1, (0, 0, 255))
+        render = font.render("Level: {}".format(self.level), 1, (0, 0, 255))
         self._display_surf.blit(render, (200, self.SCORE_SCREEN_HEIGHT/2 - render.get_height()/2))
         
     def on_loop(self):
-        self._clock.tick(App.speed)
+        self._clock.tick(self.speed)
         self._snake.pohyb(self._snake._movement)
         self._snake.is_collided()
         self._snake2.pohyb(self._snake2._movement)
