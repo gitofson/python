@@ -8,7 +8,9 @@ import pygame
 from enum import Enum
 from pygame.locals import *
 from random import randrange
-import time
+import sys
+import socket
+import pickle
 
 class Movement(Enum):
     LEFT   = 1 
@@ -128,6 +130,8 @@ class Snake:
         return len(self._body) - Snake.N_DOTS
 
 class App:
+    HOST = "127.0.0.1"  # Standard loopback interface address (localhost)
+    PORT = 65432  # Port to listen on (non-privileged ports are > 1023)  
     B_WIDTH  = 300
     B_HEIGHT = 300
     SCORE_SCREEN_HEIGHT = 40
@@ -139,6 +143,10 @@ class App:
         3: "../resources/popcorn.mid",
         4: "../resources/beat_it.mid",
     }
+    _display_surf = pygame.display.set_mode((B_WIDTH, B_HEIGHT), pygame.HWSURFACE | pygame.DOUBLEBUF)
+    _clock = pygame.time.Clock()
+    pygame.font.init()
+    pygame.mixer.init()
 
     @staticmethod
     def play_music(level):
@@ -154,22 +162,16 @@ class App:
 
         # hra neskončena
         self._running = True 
-        self._display_surf = None
-
         self.size = self.width, self.height = App.B_WIDTH, App.B_HEIGHT
-        self._clock = None
         self.speed = 8
         self.level = 1
         
         # inicializace PyGame modulů
         pygame.init()
         # nastavení velikosti okna, pokus o nastavení HW akcelerace, pokud nelze, použije se DOUBLEBUF
-        self._display_surf = pygame.display.set_mode(self.size, pygame.HWSURFACE | pygame.DOUBLEBUF)
         self._running = True
-        self._clock = pygame.time.Clock()
         self._snake = Snake(self, 50)
-        self._snake2 = Snake(self,120)
-        App.play_music(self.level)
+        #App.play_music(self.level)
 
         
     def get_bodies(self):
@@ -194,15 +196,7 @@ class App:
         if event.key == pygame.K_UP:
             self._snake.setMovement(Movement.UP)
         if event.key == pygame.K_DOWN:
-            self._snake.setMovement(Movement.DOWN)
-        if event.key == pygame.K_a:
-            self._snake2.setMovement(Movement.LEFT)
-        if event.key == pygame.K_d:
-            self._snake2.setMovement(Movement.RIGHT)
-        if event.key == pygame.K_w:
-            self._snake2.setMovement(Movement.UP)
-        if event.key == pygame.K_s:
-            self._snake2.setMovement(Movement.DOWN)            
+            self._snake.setMovement(Movement.DOWN)          
 
     def on_event(self, event):
         if event.type == QUIT:
@@ -212,13 +206,13 @@ class App:
     def game_over(self):
         pygame.mixer.music.stop()
         pygame.font.init()
-        self._display_surf.fill((0, 0, 0))
+        App._display_surf.fill((0, 0, 0))
         font = pygame.font.SysFont("Arial", 50)
         font2 = pygame.font.SysFont("Arial", 20)
         render = font.render("Game Over", 1, (255, 0, 0))
         render2 = font2.render("Score: {}".format(self._snake.getScore()), 1, (0, 255, 0))
-        self._display_surf.blit(render, (self.B_WIDTH/2 - render.get_width()/2, self.B_WIDTH/2 - render.get_height()/2))
-        self._display_surf.blit(render2, (self.B_WIDTH/2 - render2.get_width()/2, self.B_WIDTH/2 - render2.get_height()/2 + 35))
+        App._display_surf.blit(render, (self.B_WIDTH/2 - render.get_width()/2, self.B_WIDTH/2 - render.get_height()/2))
+        App._display_surf.blit(render2, (self.B_WIDTH/2 - render2.get_width()/2, self.B_WIDTH/2 - render2.get_height()/2 + 35))
         pygame.display.flip()
         while True:
             for event in pygame.event.get():
@@ -228,45 +222,67 @@ class App:
     def draw_score_screen(self):
         font = pygame.font.SysFont("Arial", 25 )
         render = font.render("Score: {}".format(self._snake.getScore()), 1, (255, 0, 0))
-        self._display_surf.blit(render, (20, self.SCORE_SCREEN_HEIGHT/2 - render.get_height()/2))
+        App._display_surf.blit(render, (20, self.SCORE_SCREEN_HEIGHT/2 - render.get_height()/2))
         
         render = font.render("Speed: {}".format(self.speed), 1, (0, 255, 0))
-        self._display_surf.blit(render, (100, self.SCORE_SCREEN_HEIGHT/2 - render.get_height()/2))
+        App._display_surf.blit(render, (100, self.SCORE_SCREEN_HEIGHT/2 - render.get_height()/2))
         
         render = font.render("Level: {}".format(self.level), 1, (0, 0, 255))
-        self._display_surf.blit(render, (200, self.SCORE_SCREEN_HEIGHT/2 - render.get_height()/2))
+        App._display_surf.blit(render, (200, self.SCORE_SCREEN_HEIGHT/2 - render.get_height()/2))
         
     def on_loop(self):
-        self._clock.tick(self.speed)
+        App._clock.tick(self.speed)
         self._snake.pohyb(self._snake._movement)
         self._snake.is_collided()
-        self._snake2.pohyb(self._snake2._movement)
-        self._snake2.is_collided()
     def on_render(self):
-            self._display_surf.fill((0, 0, 0))
+            App._display_surf.fill((0, 0, 0))
             self.draw_score_screen()
             self._snake.draw(self._display_surf)
-            self._snake2.draw(self._display_surf)
             pygame.draw.rect(self._display_surf, (255,0,0), pygame.Rect(
                 0, App.SCORE_SCREEN_HEIGHT, App.B_WIDTH, App.B_HEIGHT-App.SCORE_SCREEN_HEIGHT), 10)
             pygame.display.flip()
     def on_cleanup(self):
         pygame.quit()
  
-    def on_execute(self):
+    def on_execute(self, isObserver = False):
         # had
-        self._snake.init_snake()
-        self._snake2.init_snake()
+        if not isObserver:
+            self._snake.init_snake()
         # game loop
         while self._snake._running:
-            # zpracování všech typů událostí
-            for event in pygame.event.get():
-                self.on_event(event)
+            # zpracování všech typů událostí (netýká se serveru, resp. pozorovtele - observer)
+            if not isObserver:
+                for event in pygame.event.get():
+                    self.on_event(event)
             self.on_loop()
             self.on_render()
         self.game_over()
 
  
 if __name__ == "__main__" :
-    theApp = App()
+    theApp = None
+    if len(sys.argv) > 1 and sys.argv[1] == "s":
+        theApp = App()
+        with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
+            s.bind((App.HOST, App.PORT))
+            s.listen()
+            conn, addr = s.accept()
+            with conn:
+                print(f"Connected by {addr}")
+                while True:
+                    data = pickle.dumps(theApp)
+                    #data = conn.recv(1024)
+                    #print(f"Received {data!r}")
+                    conn.sendall(data)
+        theApp.on_execute(True)
+    else:
+        with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
+            s.connect((App.HOST, App.PORT))
+            while True:
+                #s.sendall(b"Hello, world")
+                data = s.recv(1024)
+                theApp = pickle.loads(data)
+                break
+                print(f"Received {data!r}")
     theApp.on_execute()
+        
