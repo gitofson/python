@@ -35,24 +35,20 @@ class Snake:
             [[13,12], [13,13], [13,14], [12,13], [14,13]]
         ]
 
-    def __init__(self, y_init):
+    def __init__(self, y_init, body_color):
         # body = tělo hada, reprezentované seznamem bodů (n-tic) jednotlivých stavebních kamenů o šířce Snake.DOT_SIZE
         self._body = []
         # aktuální pohyb
         self._movement = Movement.RIGHT
         
-        
-        # hlava hada
-        self._image_head = None
-        # stav. kámen hada
-        self._image_body = None
-        # jablko
-        self._image_apple = None
-        
         self._y_init = y_init
 
         # had nezemřel
         self._isAlive = True
+
+        self._body_color = body_color
+        # had
+        self.init_snake()
 
         
     def init_snake(self):
@@ -140,6 +136,7 @@ class App:
     @staticmethod
     def setSnake(snake):
         App._game._snake = snake
+        App._game.snakes.clear()
         App._game.snakes.append(snake)
 
     @staticmethod
@@ -208,12 +205,14 @@ class App:
         #draw apple
         surface.blit(App._image_apple, App._game.apple_position)
         #draw snake
-        surface.blit(snake._image_head, snake._body[0])
+        pygame.draw.rect(surface, (255,0,0), pygame.Rect(
+                snake._body[0][0], snake._body[0][1], Snake.DOT_SIZE, Snake.DOT_SIZE))
         #draw obstacles
         App.snake_draw_obstacles(surface)
         
         for i in range(len(snake._body) - 1):
-            surface.blit(snake._image_body, snake._body[i + 1])
+            pygame.draw.rect(surface, snake._body_color, pygame.Rect(
+                snake._body[i+1][0], snake._body[i+1][1], Snake.DOT_SIZE, Snake.DOT_SIZE))
     
     @staticmethod
     def game_over():
@@ -286,16 +285,13 @@ class App:
 
     @staticmethod
     def on_execute(isObserver = False):
-        # had
-        if not isObserver:
-            App._game._snake.init_snake()
         # game loop
         if App._game._running:
             # zpracování všech typů událostí (netýká se serveru, resp. pozorovtele - observer)
             if not isObserver:
                 for event in pygame.event.get():
                     App.on_event(App._game._snake, event)
-            App.on_loop(App._game._snake)
+                App.on_loop(App._game._snake)
             App.on_render()
         else:
             App.game_over()
@@ -328,12 +324,15 @@ if __name__ == "__main__" :
             while True:
                 #s.sendall(b"Hello, world")
                 data = s.recv(1024)
+                print(f"delka prijatych dat: {len(data)}")
                 App.setGame(pickle.loads(data))
                 if(cnt == 0):
-                    App.setSnake(Snake(40))
+                    App.setSnake(Snake(60, (0,255,0)))
+                print(f"delka pred:{len(App.getSnake()._body)}")
                 #pohneme s hadem
                 App.on_execute()
                 #pošleme hada
+                print(f"delka po:{len(App.getSnake()._body)}")
                 try:
                     data = pickle.dumps(App.getSnake())
                     s.sendall(data)
