@@ -11,6 +11,7 @@ from random import randrange
 import sys
 import socket
 import pickle
+import time
 
 class Movement(Enum):
     LEFT   = 1 
@@ -35,7 +36,7 @@ class Snake:
             [[13,12], [13,13], [13,14], [12,13], [14,13]]
         ]
 
-    def __init__(self, app, y_init):
+    def __init__(self, app, y_init, body_color):
         # body = tělo hada, reprezentované seznamem bodů (n-tic) jednotlivých stavebních kamenů o šířce Snake.DOT_SIZE
         self._body = []
         # aktuální pohyb
@@ -46,21 +47,21 @@ class Snake:
         self._image_head = None
         # stav. kámen hada
         self._image_body = None
-        # jablko
-        self._image_apple = None
+
         # Snake running
         self._running = True
         self._y_init = y_init
         self._app = app
         self._app.respawn_apple()
         self._app.snakes.append(self)
+        self._body_color = body_color
         
     def init_snake(self):
         for z in range(Snake.N_DOTS):
             self._body.append([50 - z * Snake.DOT_SIZE, self._y_init])
-        self._image_head = pygame.image.load("../resources/head.png").convert()
-        self._image_body = pygame.image.load("../resources/dot.png").convert()
-        self._image_apple = pygame.image.load("../resources/apple.png").convert()
+        #self._image_head = None #pygame.image.load("../resources/head.png").convert()
+        #self._image_body = None #pygame.image.load("../resources/dot.png").convert()
+        
         
     def pohyb(self, movement):
         head = [self._body[0][0], self._body[0][1]]
@@ -72,7 +73,9 @@ class Snake:
             head[1] -= Snake.DOT_SIZE
         if movement == Movement.DOWN:
             head[1] += Snake.DOT_SIZE
+        print(f"head: {head}, apple_pos: {self._app.apple_position}")
         if head == self._app.apple_position:
+            print("equal")
             self._body = [head] + self._body
             self._app.respawn_apple()
             self._app.speed += 0.5
@@ -81,7 +84,9 @@ class Snake:
                 App.play_music(self._app.level)
                 self._app.speed = 8
         else:
+            print("not equal")
             self._body = [head] + self._body[:-1]
+
     def is_collided(self):
         # možné body kolize sám se sebou a spoluhráči
         bodies = self._app.get_bodies()
@@ -115,14 +120,17 @@ class Snake:
 
     def draw(self, surface):
         #draw apple
-        surface.blit(self._image_apple, self._app.apple_position)
+        print(self._app.apple_position)
+        surface.blit(App._image_apple, self._app.apple_position)
         #draw snake
-        surface.blit(self._image_head, self._body[0])
+        pygame.draw.rect(surface, (255,0,0), pygame.Rect(
+                    self._body[0][0], self._body[0][1], Snake.DOT_SIZE, Snake.DOT_SIZE))
         #draw obstacles
         self.draw_obstacles(surface)
         
         for i in range(len(self._body) - 1):
-            surface.blit(self._image_body, self._body[i + 1])
+            pygame.draw.rect(surface, self._body_color, pygame.Rect(
+                    self._body[i+1][0], self._body[i+1][1], Snake.DOT_SIZE, Snake.DOT_SIZE))
     def setMovement(self, movement):
         self._movement = movement
     
@@ -147,6 +155,8 @@ class App:
     _clock = pygame.time.Clock()
     pygame.font.init()
     pygame.mixer.init()
+    # jablko
+    _image_apple = pygame.image.load("../resources/apple.png").convert()
 
     @staticmethod
     def play_music(level):
@@ -170,10 +180,14 @@ class App:
         pygame.init()
         # nastavení velikosti okna, pokus o nastavení HW akcelerace, pokud nelze, použije se DOUBLEBUF
         self._running = True
-        self._snake = Snake(self, 50)
+        self._snake = None #Snake(self, 50, (0,255,0))
         #App.play_music(self.level)
 
-        
+    def set_snake(self, snake):
+        snake._app = self
+        self._snake = snake    
+        self.snakes.append(snake)
+
     def get_bodies(self):
         bodies = []
         for snake in self.snakes:
@@ -231,14 +245,14 @@ class App:
         App._display_surf.blit(render, (200, self.SCORE_SCREEN_HEIGHT/2 - render.get_height()/2))
         
     def on_loop(self):
-        App._clock.tick(self.speed)
+        
         self._snake.pohyb(self._snake._movement)
         self._snake.is_collided()
     def on_render(self):
             App._display_surf.fill((0, 0, 0))
             self.draw_score_screen()
-            self._snake.draw(self._display_surf)
-            pygame.draw.rect(self._display_surf, (255,0,0), pygame.Rect(
+            self._snake.draw(App._display_surf)
+            pygame.draw.rect(App._display_surf, (255,0,0), pygame.Rect(
                 0, App.SCORE_SCREEN_HEIGHT, App.B_WIDTH, App.B_HEIGHT-App.SCORE_SCREEN_HEIGHT), 10)
             pygame.display.flip()
     def on_cleanup(self):
@@ -249,18 +263,21 @@ class App:
         if not isObserver:
             self._snake.init_snake()
         # game loop
-        while self._snake._running:
+        if self._snake._running:
             # zpracování všech typů událostí (netýká se serveru, resp. pozorovtele - observer)
             if not isObserver:
+                App._clock.tick(self.speed)
                 for event in pygame.event.get():
                     self.on_event(event)
             self.on_loop()
             self.on_render()
-        self.game_over()
+        else:
+            self.game_over()
 
  
 if __name__ == "__main__" :
     theApp = None
+    cnt = 0
     if len(sys.argv) > 1 and sys.argv[1] == "s":
         theApp = App()
         with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
@@ -274,6 +291,10 @@ if __name__ == "__main__" :
                     #data = conn.recv(1024)
                     #print(f"Received {data!r}")
                     conn.sendall(data)
+                    data = conn.recv(1024)
+                    theApp.set_snake(pickle.loads(data))
+                    #print(len(theApp._snake._body))
+                    theApp.on_execute(True)
         theApp.on_execute(True)
     else:
         with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
@@ -282,7 +303,12 @@ if __name__ == "__main__" :
                 #s.sendall(b"Hello, world")
                 data = s.recv(1024)
                 theApp = pickle.loads(data)
-                break
-                print(f"Received {data!r}")
-    theApp.on_execute()
+                if cnt == 0:
+                    theApp._snake = Snake (theApp, 50,  (0,255,0))
+                theApp.on_execute()
+                data = pickle.dumps(theApp._snake)
+                #time.sleep(0.2000)
+                s.sendall(data)
+                #print(f"Received {data!r}")
+    
         
