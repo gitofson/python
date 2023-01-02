@@ -103,7 +103,8 @@ class Game:
 
 class App:
     HOST = "127.0.0.1"  # Standard loopback interface address (localhost)
-    PORT = 65432  # Port to listen on (non-privileged ports are > 1023)  
+    PORT = 65432  # Port to listen on (non-privileged ports are > 1023)
+    MAX_MESSAGE_LENGTH = 1024
     B_WIDTH  = 300
     B_HEIGHT = 300
 
@@ -274,21 +275,23 @@ class App:
             App.on_key_down(snake, event)
 
     @staticmethod
-    def on_loop(snake):
-        App._clock.tick(App._game.speed)
-        App.snake_move(snake, snake.getMovement())
-        App.is_snake_collided(snake)
+    def on_loop(snake, isServer = False):
+        if not isServer:
+            App._clock.tick(App._game.speed)
+            App.snake_move(snake, snake.getMovement())
+        else:
+            App.is_snake_collided(snake)
 
     @staticmethod
     def on_cleanup(self):
         pygame.quit()
 
     @staticmethod
-    def on_execute(isObserver = False):
+    def on_execute(isServer = False):
         # game loop
         if App._game._running:
             # zpracování všech typů událostí (netýká se serveru, resp. pozorovtele - observer)
-            if not isObserver:
+            if not isServer:
                 for event in pygame.event.get():
                     App.on_event(App._game._snake, event)
                 App.on_loop(App._game._snake)
@@ -313,7 +316,7 @@ if __name__ == "__main__" :
                     #data = conn.recv(1024)
                     #print(f"Received {data!r}")
                     conn.sendall(data)
-                    data = conn.recv(1024)
+                    data = conn.recv(App.MAX_MESSAGE_LENGTH)
                     App.setSnake(pickle.loads(data))
 
         game.on_execute(True)
@@ -323,7 +326,7 @@ if __name__ == "__main__" :
             s.connect((App.HOST, App.PORT))
             while True:
                 #s.sendall(b"Hello, world")
-                data = s.recv(1024)
+                data = s.recv(App.MAX_MESSAGE_LENGTH)
                 print(f"delka prijatych dat: {len(data)}")
                 App.setGame(pickle.loads(data))
                 if(cnt == 0):
