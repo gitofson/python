@@ -35,7 +35,7 @@ class Snake:
             [[13,12], [13,13], [13,14], [12,13], [14,13]]
         ]
 
-    def __init__(self, app, y_init):
+    def __init__(self, y_init):
         # body = tělo hada, reprezentované seznamem bodů (n-tic) jednotlivých stavebních kamenů o šířce Snake.DOT_SIZE
         self._body = []
         # aktuální pohyb
@@ -48,112 +48,32 @@ class Snake:
         self._image_body = None
         # jablko
         self._image_apple = None
-        # Snake running
-        self._running = True
+        
         self._y_init = y_init
-        self._app = app
-        self._app.respawn_apple()
-        self._app.snakes.append(self)
+
+        # had nezemřel
+        self._isAlive = True
+
         
     def init_snake(self):
         for z in range(Snake.N_DOTS):
             self._body.append([50 - z * Snake.DOT_SIZE, self._y_init])
-        self._image_head = pygame.image.load("../resources/head.png").convert()
-        self._image_body = pygame.image.load("../resources/dot.png").convert()
-        self._image_apple = pygame.image.load("../resources/apple.png").convert()
+        #self._image_head = pygame.image.load("../resources/head.png").convert()
+        #self._image_body = pygame.image.load("../resources/dot.png").convert()
         
-    def pohyb(self, movement):
-        head = [self._body[0][0], self._body[0][1]]
-        if movement == Movement.LEFT:
-            head[0] -= Snake.DOT_SIZE
-        if movement == Movement.RIGHT:
-            head[0] += Snake.DOT_SIZE
-        if movement == Movement.UP:
-            head[1] -= Snake.DOT_SIZE
-        if movement == Movement.DOWN:
-            head[1] += Snake.DOT_SIZE
-        if head == self._app.apple_position:
-            self._body = [head] + self._body
-            self._app.respawn_apple()
-            self._app.speed += 0.5
-            if self._app.speed >= App.SPEED_LEVEL_LIMIT:
-                self._app.level += 1
-                App.play_music(self._app.level)
-                self._app.speed = 8
-        else:
-            self._body = [head] + self._body[:-1]
-    def is_collided(self):
-        # možné body kolize sám se sebou a spoluhráči
-        bodies = self._app.get_bodies()
-        bodies.remove(self._body[0])
-        # S koncem obrazovky
-        if (self._body[0][0] == 0
-            or self._body[0][0] == App.B_WIDTH-Snake.DOT_SIZE
-            or self._body[0][1] == App.SCORE_SCREEN_HEIGHT
-            or self._body[0][1] == App.B_HEIGHT-Snake.DOT_SIZE
-            # sám se sebou, či s ostatními
-            or self._body[0] in bodies
-            # s překážkami:
-            or self._body[0] in map(
-                lambda p: [p[0] * Snake.DOT_SIZE, p[1] * Snake.DOT_SIZE], 
-                sum(Snake.OBSTACLES[:self._app.level-1],[]))):
+    def getMovement(self):
+        return self._movement
 
-            self._running = False
-
-
-
-    def draw_obstacles(self, surface):
-        cnt = 0
-        for obstacle in Snake.OBSTACLES:
-            cnt += 1
-            if cnt == self._app.level:
-                break
-            for p in obstacle:
-                pygame.draw.rect(surface, (0,0,255), pygame.Rect(
-                    Snake.DOT_SIZE * p[0], Snake.DOT_SIZE * p[1], Snake.DOT_SIZE, Snake.DOT_SIZE), 3)
-            
-
-    def draw(self, surface):
-        #draw apple
-        surface.blit(self._image_apple, self._app.apple_position)
-        #draw snake
-        surface.blit(self._image_head, self._body[0])
-        #draw obstacles
-        self.draw_obstacles(surface)
-        
-        for i in range(len(self._body) - 1):
-            surface.blit(self._image_body, self._body[i + 1])
     def setMovement(self, movement):
         self._movement = movement
+    
     
     def getScore(self):
         return len(self._body) - Snake.N_DOTS
 
-class App:
-    HOST = "127.0.0.1"  # Standard loopback interface address (localhost)
-    PORT = 65432  # Port to listen on (non-privileged ports are > 1023)  
-    B_WIDTH  = 300
-    B_HEIGHT = 300
-    SCORE_SCREEN_HEIGHT = 40
-    SPEED_LEVEL_LIMIT = 10
 
-    d_level_mid = {
-        1: "../resources/tetris.mid",
-        2: "../resources/mortal_kombat.mid",
-        3: "../resources/popcorn.mid",
-        4: "../resources/beat_it.mid",
-    }
-    _display_surf = pygame.display.set_mode((B_WIDTH, B_HEIGHT), pygame.HWSURFACE | pygame.DOUBLEBUF)
-    _clock = pygame.time.Clock()
-    pygame.font.init()
-    pygame.mixer.init()
-
-    @staticmethod
-    def play_music(level):
-        pygame.mixer.music.stop()
-        pygame.mixer.music.load(App.d_level_mid.get(level))
-        pygame.mixer.music.play()
-        
+class Game:
+    SCORE_SCREEN_HEIGHT = 40   
     def __init__(self):
         # instance hráčú
         self.snakes = []
@@ -162,15 +82,13 @@ class App:
 
         # hra neskončena
         self._running = True 
-        self.size = self.width, self.height = App.B_WIDTH, App.B_HEIGHT
         self.speed = 8
         self.level = 1
         
         # inicializace PyGame modulů
         pygame.init()
         # nastavení velikosti okna, pokus o nastavení HW akcelerace, pokud nelze, použije se DOUBLEBUF
-        self._running = True
-        self._snake = Snake(self, 50)
+        #self._snake = Snake(self, 50)
         #App.play_music(self.level)
 
         
@@ -183,86 +101,211 @@ class App:
     def respawn_apple(self):
         while True:
             self.apple_position = [randrange(1,Snake.APPLE_MAX_POS-1)*Snake.DOT_SIZE,
-                                    randrange(int(App.SCORE_SCREEN_HEIGHT/Snake.DOT_SIZE + 1), Snake.APPLE_MAX_POS-1)*Snake.DOT_SIZE]
+                                    randrange(int(Game.SCORE_SCREEN_HEIGHT/Snake.DOT_SIZE + 1), Snake.APPLE_MAX_POS-1)*Snake.DOT_SIZE]
             if self.apple_position not in self.get_bodies() and self.apple_position not in sum(Snake.OBSTACLES[:self.level-1],[]):
                 break
-    def on_input_focus(self):
-        pass
-    def on_key_down(self, event):
-        if event.key == pygame.K_LEFT:
-            self._snake.setMovement(Movement.LEFT)
-        if event.key == pygame.K_RIGHT:
-            self._snake.setMovement(Movement.RIGHT)
-        if event.key == pygame.K_UP:
-            self._snake.setMovement(Movement.UP)
-        if event.key == pygame.K_DOWN:
-            self._snake.setMovement(Movement.DOWN)          
 
-    def on_event(self, event):
-        if event.type == QUIT:
-            self._running = False
-        elif event.type == KEYDOWN:
-            self.on_key_down(event)
-    def game_over(self):
+class App:
+    HOST = "127.0.0.1"  # Standard loopback interface address (localhost)
+    PORT = 65432  # Port to listen on (non-privileged ports are > 1023)  
+    B_WIDTH  = 300
+    B_HEIGHT = 300
+
+    SPEED_LEVEL_LIMIT = 10
+
+    d_level_mid = {
+        1: "../resources/tetris.mid",
+        2: "../resources/mortal_kombat.mid",
+        3: "../resources/popcorn.mid",
+        4: "../resources/beat_it.mid",
+    }
+    _display_surf = pygame.display.set_mode((B_WIDTH, B_HEIGHT), pygame.HWSURFACE | pygame.DOUBLEBUF)
+    _clock = pygame.time.Clock()
+    _image_apple = pygame.image.load("../resources/apple.png").convert()
+        
+    
+    pygame.font.init()
+    pygame.mixer.init()
+
+    @staticmethod
+    def init():
+        App._game = Game()
+        App._game.respawn_apple()
+        
+
+    @staticmethod
+    def setGame(game):
+        App._game = game
+    
+    @staticmethod
+    def setSnake(snake):
+        App._game._snake = snake
+        App._game.snakes.append(snake)
+
+    @staticmethod
+    def getSnake():
+        return App._game._snake
+
+    @staticmethod
+    def play_music(level):
+        pygame.mixer.music.stop()
+        pygame.mixer.music.load(App.d_level_mid.get(level))
+        pygame.mixer.music.play()
+
+    @staticmethod
+    def snake_move(snake, movement):
+        head = [snake._body[0][0], snake._body[0][1]]
+        if movement == Movement.LEFT:
+            head[0] -= Snake.DOT_SIZE
+        if movement == Movement.RIGHT:
+            head[0] += Snake.DOT_SIZE
+        if movement == Movement.UP:
+            head[1] -= Snake.DOT_SIZE
+        if movement == Movement.DOWN:
+            head[1] += Snake.DOT_SIZE
+        if head == App._game.apple_position:
+            snake._body = [head] + snake._body
+            App._game.respawn_apple()
+            App._game.speed += 0.5
+            if App._game.speed >= App.SPEED_LEVEL_LIMIT:
+                App._game.level += 1
+                App.play_music(App._game.level)
+                App._game.speed = 8
+        else:
+            snake._body = [head] + snake._body[:-1]
+    
+    @staticmethod
+    def is_snake_collided(snake):
+        # možné body kolize sám se sebou a spoluhráči
+        bodies = App._game.get_bodies()
+        bodies.remove(snake._body[0])
+        # S koncem obrazovky
+        if (snake._body[0][0] == 0
+            or snake._body[0][0] == App.B_WIDTH-Snake.DOT_SIZE
+            or snake._body[0][1] == Game.SCORE_SCREEN_HEIGHT
+            or snake._body[0][1] == App.B_HEIGHT-Snake.DOT_SIZE
+            # sám se sebou, či s ostatními
+            or snake._body[0] in bodies
+            # s překážkami:
+            or snake._body[0] in map(
+                lambda p: [p[0] * Snake.DOT_SIZE, p[1] * Snake.DOT_SIZE], 
+                sum(Snake.OBSTACLES[:App._game.level-1],[]))):
+            snake._isAlive = False
+
+    @staticmethod
+    def snake_draw_obstacles(surface):
+        cnt = 0
+        for obstacle in Snake.OBSTACLES:
+            cnt += 1
+            if cnt == App._game.level:
+                break
+            for p in obstacle:
+                pygame.draw.rect(surface, (0,0,255), pygame.Rect(
+                    Snake.DOT_SIZE * p[0], Snake.DOT_SIZE * p[1], Snake.DOT_SIZE, Snake.DOT_SIZE), 3)
+            
+    @staticmethod
+    def snake_draw(snake, surface):
+        #draw apple
+        surface.blit(App._image_apple, App._game.apple_position)
+        #draw snake
+        surface.blit(snake._image_head, snake._body[0])
+        #draw obstacles
+        App.snake_draw_obstacles(surface)
+        
+        for i in range(len(snake._body) - 1):
+            surface.blit(snake._image_body, snake._body[i + 1])
+    
+    @staticmethod
+    def game_over():
         pygame.mixer.music.stop()
         pygame.font.init()
         App._display_surf.fill((0, 0, 0))
         font = pygame.font.SysFont("Arial", 50)
         font2 = pygame.font.SysFont("Arial", 20)
         render = font.render("Game Over", 1, (255, 0, 0))
-        render2 = font2.render("Score: {}".format(self._snake.getScore()), 1, (0, 255, 0))
-        App._display_surf.blit(render, (self.B_WIDTH/2 - render.get_width()/2, self.B_WIDTH/2 - render.get_height()/2))
-        App._display_surf.blit(render2, (self.B_WIDTH/2 - render2.get_width()/2, self.B_WIDTH/2 - render2.get_height()/2 + 35))
+        render2 = font2.render("Score: {}".format(App._game._snake.getScore()), 1, (0, 255, 0))
+        App._display_surf.blit(render, (App._game.B_WIDTH/2 - render.get_width()/2, App._game.B_WIDTH/2 - render.get_height()/2))
+        App._display_surf.blit(render2, (App._game.B_WIDTH/2 - render2.get_width()/2, App._game.B_WIDTH/2 - render2.get_height()/2 + 35))
         pygame.display.flip()
         while True:
             for event in pygame.event.get():
                 if event.type == KEYDOWN and event.key == pygame.K_SPACE:
-                    self.on_cleanup()
-                    
-    def draw_score_screen(self):
+                    App._game.on_cleanup()
+    @staticmethod
+    def draw_score_screen():
         font = pygame.font.SysFont("Arial", 25 )
-        render = font.render("Score: {}".format(self._snake.getScore()), 1, (255, 0, 0))
-        App._display_surf.blit(render, (20, self.SCORE_SCREEN_HEIGHT/2 - render.get_height()/2))
+        render = font.render("Score: {}".format(App._game._snake.getScore()), 1, (255, 0, 0))
+        App._display_surf.blit(render, (20, App._game.SCORE_SCREEN_HEIGHT/2 - render.get_height()/2))
         
-        render = font.render("Speed: {}".format(self.speed), 1, (0, 255, 0))
-        App._display_surf.blit(render, (100, self.SCORE_SCREEN_HEIGHT/2 - render.get_height()/2))
+        render = font.render("Speed: {}".format(App._game.speed), 1, (0, 255, 0))
+        App._display_surf.blit(render, (100, App._game.SCORE_SCREEN_HEIGHT/2 - render.get_height()/2))
         
-        render = font.render("Level: {}".format(self.level), 1, (0, 0, 255))
-        App._display_surf.blit(render, (200, self.SCORE_SCREEN_HEIGHT/2 - render.get_height()/2))
-        
-    def on_loop(self):
-        App._clock.tick(self.speed)
-        self._snake.pohyb(self._snake._movement)
-        self._snake.is_collided()
-    def on_render(self):
-            App._display_surf.fill((0, 0, 0))
-            self.draw_score_screen()
-            self._snake.draw(self._display_surf)
-            pygame.draw.rect(self._display_surf, (255,0,0), pygame.Rect(
-                0, App.SCORE_SCREEN_HEIGHT, App.B_WIDTH, App.B_HEIGHT-App.SCORE_SCREEN_HEIGHT), 10)
-            pygame.display.flip()
+        render = font.render("Level: {}".format(App._game.level), 1, (0, 0, 255))
+        App._display_surf.blit(render, (200, App._game.SCORE_SCREEN_HEIGHT/2 - render.get_height()/2))
+    
+    @staticmethod    
+    def on_render():
+        App._display_surf.fill((0, 0, 0))
+        App.draw_score_screen()
+        App.snake_draw(App._game._snake, App._display_surf)
+        pygame.draw.rect(App._display_surf, (255,0,0), pygame.Rect(
+            0, Game.SCORE_SCREEN_HEIGHT, App.B_WIDTH, App.B_HEIGHT-Game.SCORE_SCREEN_HEIGHT), 10)
+        pygame.display.flip()
+    
+    @staticmethod
+    def on_input_focus():
+        pass
+
+    @staticmethod
+    def on_key_down(snake, event):
+        if event.key == pygame.K_LEFT:
+            snake.setMovement(Movement.LEFT)
+        if event.key == pygame.K_RIGHT:
+            snake.setMovement(Movement.RIGHT)
+        if event.key == pygame.K_UP:
+            snake.setMovement(Movement.UP)
+        if event.key == pygame.K_DOWN:
+            snake.setMovement(Movement.DOWN)          
+
+    @staticmethod
+    def on_event(snake, event):
+        if event.type == QUIT:
+            App._game._running = False
+        elif event.type == KEYDOWN:
+            App.on_key_down(snake, event)
+
+    @staticmethod
+    def on_loop(snake):
+        App._clock.tick(App._game.speed)
+        App.snake_move(snake, snake.getMovement())
+        App.is_snake_collided(snake)
+
+    @staticmethod
     def on_cleanup(self):
         pygame.quit()
- 
-    def on_execute(self, isObserver = False):
+
+    @staticmethod
+    def on_execute(isObserver = False):
         # had
         if not isObserver:
-            self._snake.init_snake()
+            App._game._snake.init_snake()
         # game loop
-        while self._snake._running:
+        if App._game._running:
             # zpracování všech typů událostí (netýká se serveru, resp. pozorovtele - observer)
             if not isObserver:
                 for event in pygame.event.get():
-                    self.on_event(event)
-            self.on_loop()
-            self.on_render()
-        self.game_over()
+                    App.on_event(App._game._snake, event)
+            App.on_loop(App._game._snake)
+            App.on_render()
+        else:
+            App.game_over()
 
- 
+
+
 if __name__ == "__main__" :
-    theApp = None
+    game = None
     if len(sys.argv) > 1 and sys.argv[1] == "s":
-        theApp = App()
+        App.init()
         with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
             s.bind((App.HOST, App.PORT))
             s.listen()
@@ -270,19 +313,33 @@ if __name__ == "__main__" :
             with conn:
                 print(f"Connected by {addr}")
                 while True:
-                    data = pickle.dumps(theApp)
+                    data = pickle.dumps(App._game)
                     #data = conn.recv(1024)
                     #print(f"Received {data!r}")
                     conn.sendall(data)
-        theApp.on_execute(True)
+                    data = conn.recv(1024)
+                    App.setSnake(pickle.loads(data))
+
+        game.on_execute(True)
     else:
         with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
+            cnt = 0
             s.connect((App.HOST, App.PORT))
             while True:
                 #s.sendall(b"Hello, world")
                 data = s.recv(1024)
-                theApp = pickle.loads(data)
-                break
-                print(f"Received {data!r}")
-    theApp.on_execute()
+                App.setGame(pickle.loads(data))
+                if(cnt == 0):
+                    App.setSnake(Snake(40))
+                #pohneme s hadem
+                App.on_execute()
+                #pošleme hada
+                try:
+                    data = pickle.dumps(App.getSnake())
+                    s.sendall(data)
+                except (EnvironmentError, pickle.PicklingError) as err:
+                    print(err)
+                cnt += 1
+                #print(f"Received {data!r}")
+
         
