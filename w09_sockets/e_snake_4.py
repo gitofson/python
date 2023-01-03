@@ -52,7 +52,6 @@ class Snake:
         self._running = True
         self._y_init = y_init
         self._app = app
-        self._app.respawn_apple()
         self._app.snakes.append(self)
         self._body_color = body_color
         
@@ -175,6 +174,7 @@ class App:
         self.size = self.width, self.height = App.B_WIDTH, App.B_HEIGHT
         self.speed = 8
         self.level = 1
+        self.respawn_apple()
         
         # inicializace PyGame modulů
         pygame.init()
@@ -258,18 +258,18 @@ class App:
     def on_cleanup(self):
         pygame.quit()
  
-    def on_execute(self, isObserver = False):
+    def on_execute(self, isServer = False):
         # had
-        if not isObserver:
+        if not isServer:
             self._snake.init_snake()
         # game loop
-        if self._snake._running:
+        if self._snake._running or isServer:
             # zpracování všech typů událostí (netýká se serveru, resp. pozorovtele - observer)
-            if not isObserver:
+            if not isServer:
                 App._clock.tick(self.speed)
                 for event in pygame.event.get():
                     self.on_event(event)
-            self.on_loop()
+                self.on_loop()
             self.on_render()
         else:
             self.game_over()
