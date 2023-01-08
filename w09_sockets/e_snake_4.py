@@ -133,7 +133,7 @@ class App:
     _display_surf = pygame.display.set_mode((B_WIDTH, B_HEIGHT), pygame.HWSURFACE | pygame.DOUBLEBUF)
     _clock = pygame.time.Clock()
     _image_apple = pygame.image.load("../resources/apple.png").convert()
-    _client_snake = None
+    _client_snake_uuidake = None
         
     
     pygame.font.init()
@@ -151,8 +151,8 @@ class App:
     
     @staticmethod
     def setSnake(snake):
-        #App._game._actual_snake_uuid = snake.uuid
-        App._client_snake = snake
+        App._client_snake_uuid = snake.uuid
+        #App._client_snake = snake
         #App._game.snakes.clear()
         App._game.snakes[snake.uuid] = snake
 
@@ -162,7 +162,7 @@ class App:
 
     @staticmethod
     def get_client_snake():
-        return App._client_snake
+        return App._game.snakes[App._client_snake_uuid]
 
     @staticmethod
     def play_music(level):
@@ -192,6 +192,7 @@ class App:
     def is_snake_collided(snake):
         # možné body kolize sám se sebou a spoluhráči
         bodies = App._game.get_bodies()
+        print(f'bodies:{bodies}, body:{snake._body[0]}')
         bodies.remove(snake._body[0])
         # S koncem obrazovky
         if (snake._body[0][0] == 0
@@ -293,12 +294,10 @@ class App:
             App.on_key_down(snake, event)
 
     @staticmethod
-    def on_loop(snake, isServer = False):
-        if not isServer:
-            App._clock.tick(App._game.speed)
-            App.snake_move(snake, snake.movement)
-        else:
-            App.is_snake_collided(snake)
+    def on_loop(snake):
+        App._clock.tick(App._game.speed)
+        App.snake_move(snake, snake.movement)
+        App.is_snake_collided(snake)
 
     @staticmethod
     def on_cleanup(self):
@@ -352,8 +351,6 @@ if __name__ == "__main__" :
                     data = conn.recv(App.MAX_MESSAGE_LENGTH)
                     App.setSnake(pickle.loads(data))
                     App.on_execute(True)
-
-        game.on_execute(True)
     else:
         with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
             cnt = 0
@@ -378,5 +375,3 @@ if __name__ == "__main__" :
                     print(err)
                 cnt += 1
                 #print(f"Received {data!r}")
-
-        
