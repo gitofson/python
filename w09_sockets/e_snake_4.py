@@ -340,49 +340,45 @@ class Network:
     sel = selectors.DefaultSelector()
 
     @staticmethod
-    def server_register_data_to_send(conn, addr):
-        outb = pickle.dumps(App._game)
-        data = types.SimpleNamespace(addr=addr, inb=b"", outb=outb, msg_total=len(outb), recv_total=0)
-        events = selectors.EVENT_READ | selectors.EVENT_WRITE
-        Network.sel.register(conn, events, data=data)
-
-    @staticmethod
     def server_accept_wrapper(sock):
         conn, addr = sock.accept()  # Should be ready to read
         print(f"Accepted connection from {addr}")
         conn.setblocking(False)
-        Network.server_register_data_to_send(conn, addr)
+        outb = pickle.dumps(App._game)
+        #data = types.SimpleNamespace(addr=addr, inb=b"", outb=outb, msg_total=len(outb), recv_total=0)
+        data = types.SimpleNamespace(addr=addr, inb=b"", outb=outb)
+        events = selectors.EVENT_READ | selectors.EVENT_WRITE
+        Network.sel.register(conn, events, data=data)
 
     @staticmethod
     def server_service_connection(key, mask):
         sock = key.fileobj
         data = key.data
+
+        if mask & selectors.EVENT_WRITE:
+            if data.outb:
+                game = pickle.loads(data.outb)
+                print(f"Sending {type(game)}, snakes: {game.snakes.keys()} to {data.addr}")
+                sent = sock.send(data.outb)  # Should be ready to write
+                data.outb = data.outb[sent:]
+                #TODO: finish multiple receive in client side
+                data.outb = b""
+
         if mask & selectors.EVENT_READ:
             recv_data = sock.recv(Network.MAX_MESSAGE_LENGTH)  # Should be ready to read
             if recv_data:
-                data.inb += recv_data
+                #data.inb += recv_data
+                data.inb = recv_data
             # všechna data přenesena
             #else:
-                # print(f"Closing connection to {data.addr}")
-                # odstranění z monitoringu selectů
+                print(f"received:{data.inb}")
                 App.setSnake(pickle.loads(data.inb))
                 App.on_execute(True)
-                Network.sel.unregister(sock)
-                Network.server_register_data_to_send(sock, data.addr)
+                # odstranění z monitoringu selectů
+                #Network.sel.unregister(sock)
+                #Network.server_register_data_to_send(sock, data.addr)
+                data.outb = pickle.dumps(App._game)
                 #sock.close()
-                
-        if mask & selectors.EVENT_WRITE:
-            if data.outb:
-                print(f"Sending {data.outb!r} to {data.addr}")
-                sent = sock.send(data.outb)  # Should be ready to write
-                data.outb = data.outb[sent:]
-
-    @staticmethod
-    def client_register_data_to_send(conn, snake):
-        outb = pickle.dumps(snake)
-        data = types.SimpleNamespace(addr=None, inb=b"", outb=outb, msg_total=len(outb), recv_total=0)
-        events = selectors.EVENT_READ | selectors.EVENT_WRITE
-        Network.sel.register(conn, events, data=data)
 
     # inicializace spojení
     @staticmethod
@@ -395,9 +391,11 @@ class Network:
         # rozdíl oproti connect(addr): connect(addr) může vyhodit výjimku BlockingIOError exception,
         # connect_ex(addr) pouze může vrátit indikátor chyby errno.EINPROGRESS
         sock.connect_ex(server_addr)
-        # zatím nemáme instanci snake, čekáme na instanci Game z serveru
-        Network.sel.register(sock, selectors.EVENT_READ, 
-        data=types.SimpleNamespace(addr=None, inb=b"", outb=b"", msg_total=0, recv_total=0))
+        #outb = pickle.dumps(snake)
+        #data = types.SimpleNamespace(addr=None, inb=b"", outb=outb, msg_total=len(outb), recv_total=0)
+        data = types.SimpleNamespace(addr=None, inb=b"", outb=b"")
+        events = selectors.EVENT_READ | selectors.EVENT_WRITE
+        Network.sel.register(sock, events, data=data)
 
     @staticmethod
     def client_service_connection(key, mask):
@@ -406,9 +404,10 @@ class Network:
         if mask & selectors.EVENT_READ:
             recv_data = sock.recv(Network.MAX_MESSAGE_LENGTH)  # Should be ready to read
             if recv_data:
-                data.recv_total += len(recv_data)
-                data.inb += recv_data
-                print(f"total:{data.recv_total}, msg:{data.msg_total}, Received {recv_data!r} from server")
+                #data.recv_total += len(recv_data)
+                #data.inb += recv_data
+                data.inb = recv_data
+                #print(f"total:{data.recv_total}, msg:{data.msg_total}, Received {recv_data!r} from server")
                 
             #if not recv_data or data.recv_total == data.msg_total:
                 print(f"delka prijatych dat: {len(data.inb)}")
@@ -417,7 +416,7 @@ class Network:
                 # v první iteraci vytvoříme hada
                 if createSnake:
                     App.setSnake(Snake(60, (0,255,0)))
-
+                print(f" create:{createSnake} snakes:{App._game.snakes.keys()}")
                 print(f"delka pred:{len(App.get_client_snake()._body)}")
                 #pohneme s hadem
                 App.on_execute()
@@ -425,8 +424,8 @@ class Network:
                 print(f"delka po:{len(App.get_client_snake()._body)}")
                 # odstranění z monitoringu selectů
                 #sock.close()
-                Network.sel.unregister(sock)
-                Network.client_register_data_to_send(sock, App.get_client_snake())
+                data.outb = pickle.dumps(App.get_client_snake())
+                #Network.sel.unregister(sock)
 
         if mask & selectors.EVENT_WRITE:
             #if not data.outb and data.messages:
@@ -434,10 +433,10 @@ class Network:
             if data.outb:
                 print(f"Sending {data.outb!r} to server.")
                 sent = sock.send(data.outb)  # Should be ready to write
-                data.outb = data.outb[sent:]
+                #data.outb = data.outb[sent:]
+                data.outb = b""
 
 if __name__ == "__main__" :
-    game = None
     #server
     if len(sys.argv) > 1 and sys.argv[1] == "s":
         App.init()
@@ -462,21 +461,6 @@ if __name__ == "__main__" :
             print("Caught keyboard interrupt, exiting")
         finally:
             Network.sel.close()
-
-        with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
-            s.bind(('0.0.0.0', Network.PORT))
-            s.listen()
-            conn, addr = s.accept()
-            with conn:
-                print(f"Connected by {addr}")
-                while True:
-                    data = pickle.dumps(App._game)
-                    #data = conn.recv(1024)
-                    #print(f"Received {data!r}")
-                    conn.sendall(data)
-                    data = conn.recv(App.MAX_MESSAGE_LENGTH)
-                    App.setSnake(pickle.loads(data))
-                    App.on_execute(True)
     else:
         Network.client_start_connection()
         try:
@@ -492,13 +476,3 @@ if __name__ == "__main__" :
             print("Caught keyboard interrupt, exiting")
         finally:
             Network.sel.close()
-
-        with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
-            cnt = 0
-            s.connect((Network.HOST, Network.PORT))
-            while True:
-                #s.sendall(b"Hello, world")
-
-                
-                cnt += 1
-                #print(f"Received {data!r}")
