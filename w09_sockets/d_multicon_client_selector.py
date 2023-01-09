@@ -36,11 +36,14 @@ def start_connections(host, port, num_conns):
         # registrace selektoru
         sel.register(sock, events, data=data)
         
-# key  - data (.data) - obsahuje mj. :
-#                       data.connid     - údaje o spojení
-#                       data.recv_total - počet 
-#                       data.msg_total  - počet
-#      - odkaz na socket (.fileobj)
+#key - an instance of SelectorKey class - a namedtuple used to associate a file object to its underlying file descriptor,
+#      selected event mask and attached data. It is returned by several BaseSelector methods.
+#      fileobj - File object registered (socket reference).
+#      fd      - Underlying file descriptor.
+#      events  - Events that must be waited for on this file object.
+#      data    - Optional opaque data associated to this file object: for example,
+#                this could be used to store a per-client session ID.        
+
 # mask - informace, jak má být s daty nakládáno. Hodnoty např. v konstantách 
 #        selectors.EVENT_READ, nebo selectors.EVENT_WRITE
 def service_connection(key, mask):
