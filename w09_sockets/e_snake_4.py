@@ -339,7 +339,8 @@ class App:
             App.game_over()
 
 class Network:
-    HOST = "127.0.0.1"  # Standard loopback interface address (localhost)
+    HOST_CLIENT = "127.0.0.1"  # Standard loopback interface address (localhost)
+    HOST_SERVER = "0.0.0.0"
     PORT = 65432  # Port to listen on (non-privileged ports are > 1023)
     MAX_MESSAGE_LENGTH = 1024
     sel = selectors.DefaultSelector()
@@ -388,7 +389,7 @@ class Network:
     # inicializace spojení
     @staticmethod
     def client_start_connection():
-        server_addr = (Network.HOST, Network.PORT)
+        server_addr = (Network.HOST_CLIENT, Network.PORT)
         print(f"Starting connection to {server_addr}")
         sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         # každý socket nastaven do neblokujícího módu
@@ -446,9 +447,9 @@ if __name__ == "__main__" :
     if len(sys.argv) > 1 and sys.argv[1] == "s":
         App.init(True)
         lsock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        lsock.bind((Network.HOST, Network.PORT))
+        lsock.bind((Network.HOST_SERVER, Network.PORT))
         lsock.listen()
-        print(f"Listening on {(Network.HOST, Network.PORT)}")
+        print(f"Listening on {(Network.HOST_SERVER, Network.PORT)}")
         lsock.setblocking(False)
         Network.sel.register(lsock, selectors.EVENT_READ, data=None)
         try:
