@@ -136,15 +136,19 @@ class App:
     _image_apple = pygame.image.load("../resources/apple.png").convert()
     _client_snake_uuidake = None
     _game = None
+    _is_server_mode = False
         
     
-    pygame.font.init()
-    pygame.mixer.init()
 
     @staticmethod
-    def init():
-        App._game = Game()
-        App._game.respawn_apple()
+    def init(isServer=False):
+        App._is_server_mode = isServer
+        pygame.font.init()
+        if App._is_server_mode:
+            App._game = Game()
+            App._game.respawn_apple()
+        else:
+            pygame.mixer.init()
         
 
     @staticmethod
@@ -158,19 +162,19 @@ class App:
         #App._game.snakes.clear()
         App._game.snakes[snake.uuid] = snake
 
-    #@staticmethod
-    #def getSnake():
-    #    return App._game.snakes[App._game._actual_snake_uuid]
-
     @staticmethod
     def get_client_snake():
         return App._game.snakes[App._client_snake_uuid]
+    @staticmethod
+    def is_server_mode():
+        return App._is_server_mode
 
     @staticmethod
     def play_music(level):
-        pygame.mixer.music.stop()
-        pygame.mixer.music.load(App.d_level_mid.get(level))
-        pygame.mixer.music.play()
+        if not App.is_server_mode():
+            pygame.mixer.music.stop()
+            pygame.mixer.music.load(App.d_level_mid.get(level))
+            pygame.mixer.music.play()
 
     @staticmethod
     def snake_move(snake, movement):
@@ -236,8 +240,9 @@ class App:
     
     @staticmethod
     def game_over():
-        pygame.mixer.music.stop()
-        pygame.font.init()
+        if not App.is_server_mode():
+            pygame.mixer.music.stop()
+        #pygame.font.init()
         App._display_surf.fill((0, 0, 0))
         font = pygame.font.SysFont("Arial", 50)
         font2 = pygame.font.SysFont("Arial", 20)
@@ -306,12 +311,12 @@ class App:
         pygame.quit()
 
     @staticmethod
-    def on_execute(isServer = False):
+    def on_execute():
         # game loop
         if App._game._running:
             App._display_surf.fill((0, 0, 0))
             # zpracování všech typů událostí (netýká se serveru, resp. pozorovtele - observer)
-            if not isServer:
+            if not App.is_server_mode():
                 for event in pygame.event.get():
                     App.on_event(App.get_client_snake(), event)
                 App.on_loop(App.get_client_snake())
@@ -330,7 +335,7 @@ class App:
                     App.on_render(snake)
         else:
             App.game_over()
-        if not isServer and not App.get_client_snake()._is_alive:
+        if not App.is_server_mode() and not App.get_client_snake()._is_alive:
             App.game_over()
 
 class Network:
@@ -373,7 +378,7 @@ class Network:
             #else:
                 print(f"received:{data.inb}")
                 App.setSnake(pickle.loads(data.inb))
-                App.on_execute(True)
+                App.on_execute()
                 # odstranění z monitoringu selectů
                 #Network.sel.unregister(sock)
                 #Network.server_register_data_to_send(sock, data.addr)
@@ -439,7 +444,7 @@ class Network:
 if __name__ == "__main__" :
     #server
     if len(sys.argv) > 1 and sys.argv[1] == "s":
-        App.init()
+        App.init(True)
         lsock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         lsock.bind((Network.HOST, Network.PORT))
         lsock.listen()
@@ -462,6 +467,7 @@ if __name__ == "__main__" :
         finally:
             Network.sel.close()
     else:
+        App.init()
         Network.client_start_connection()
         try:
             while True:
