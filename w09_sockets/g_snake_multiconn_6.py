@@ -1,6 +1,11 @@
 # inspirace: https://zetcode.com/javagames/snake/
 
 # Síťová verze hry snake - díky selektorům se může k serveru připojit více klientů.
+# Ukol:
+# - rozšiřte hrací plochu
+# - do třídy Snake přidejte instanční proměnnou jména hráče (hada)
+# - vytvořte pole (napravo od hrací plochy) s legendou jednotlivých hráčú
+#   (had dané barvy + jméno hráče).
 
 import pygame
 from enum import Enum
