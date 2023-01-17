@@ -324,6 +324,8 @@ class App:
                     App.on_event(App.get_client_snake(), event)
                 App.on_loop(App.get_client_snake())
                 App.on_render(App.get_client_snake())
+        else:
+            App.game_over()
         for snake in App._game.snakes.values():   
             print(f"processing snake: position: {snake._body[0]}, length: {len(snake._body)}")
             #print(f"processing snake: {snake.uuid}")
@@ -335,8 +337,7 @@ class App:
                     App.play_music(App._game.level)
                     App._game.speed = App.INITIAL_SPEED
             App.on_render(snake)
-        else:
-            App.game_over()
+
         if not App.is_server_mode() and not App.get_client_snake()._is_alive:
             App.game_over()
 
