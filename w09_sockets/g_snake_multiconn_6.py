@@ -271,10 +271,18 @@ class App:
         render = font.render("Level: {}".format(App._game.level), 1, (0, 0, 255))
         App._display_surf.blit(render, (200, App._game.SCORE_SCREEN_HEIGHT/2 - render.get_height()/2))
     
+    #Dodělat!
+    @staticmethod
+    def draw_legend_screen():
+        if(App._game):
+            for snake in App._game.snakes.values():
+                print(snake._name)
+            
     @staticmethod    
     def on_render(snake):
         #App._display_surf.fill((0, 0, 0))
         App.draw_score_screen()
+        App.draw_legend_screen()
         App.snake_draw(snake, App._display_surf)
         pygame.draw.rect(App._display_surf, (255,0,0), pygame.Rect(
             0, Game.SCORE_SCREEN_HEIGHT, App.B_WIDTH, App.B_HEIGHT-Game.SCORE_SCREEN_HEIGHT), 10)
