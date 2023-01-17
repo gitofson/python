@@ -257,7 +257,7 @@ class App:
         while True:
             for event in pygame.event.get():
                 if event.type == KEYDOWN and event.key == pygame.K_SPACE:
-                    App._game.on_cleanup()
+                    App.on_cleanup()
     @staticmethod
     def draw_score_screen():
         font = pygame.font.SysFont("Arial", 25 )
@@ -324,28 +324,27 @@ class App:
                     App.on_event(App.get_client_snake(), event)
                 App.on_loop(App.get_client_snake())
                 App.on_render(App.get_client_snake())
-            else:
-                for snake in App._game.snakes.values():   
-                    print(f"processing snake: position: {snake._body[0]}, length: {len(snake._body)}")
-                    #print(f"processing snake: {snake.uuid}")
-                    if snake.is_apple_consumed:
-                        App._game.respawn_apple()
-                        App._game.speed += 0.5
-                        if App._game.speed >= App.SPEED_LEVEL_LIMIT:
-                            App._game.level += 1
-                            App.play_music(App._game.level)
-                            App._game.speed = App.INITIAL_SPEED
-                    App.on_render(snake)
+        for snake in App._game.snakes.values():   
+            print(f"processing snake: position: {snake._body[0]}, length: {len(snake._body)}")
+            #print(f"processing snake: {snake.uuid}")
+            if snake.is_apple_consumed:
+                App._game.respawn_apple()
+                App._game.speed += 0.5
+                if App._game.speed >= App.SPEED_LEVEL_LIMIT:
+                    App._game.level += 1
+                    App.play_music(App._game.level)
+                    App._game.speed = App.INITIAL_SPEED
+            App.on_render(snake)
         else:
             App.game_over()
         if not App.is_server_mode() and not App.get_client_snake()._is_alive:
             App.game_over()
 
 class Network:
-    HOST_CLIENT = "127.0.0.1"  # Standard loopback interface address (localhost)
+    HOST_CLIENT = "192.168.5.132"  # Standard loopback interface address (localhost)
     HOST_SERVER = "0.0.0.0"
     PORT = 65432  # Port to listen on (non-privileged ports are > 1023)
-    MAX_MESSAGE_LENGTH = 1024
+    MAX_MESSAGE_LENGTH = 20000
     sel = selectors.DefaultSelector()
 
     @staticmethod
