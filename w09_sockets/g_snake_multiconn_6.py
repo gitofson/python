@@ -274,9 +274,14 @@ class App:
     #Dodělat!
     @staticmethod
     def draw_legend_screen():
+        y = 20
         if(App._game):
             for snake in App._game.snakes.values():
                 print(snake._name)
+                y += 20
+                font = pygame.font.SysFont("Arial", 20)
+                render = font.render(snake._name, 1, (snake._body_color))
+                App._display_surf.blit(render, (App.B_WIDTH - 100, y ))
             
     @staticmethod    
     def on_render(snake):
@@ -353,7 +358,7 @@ class App:
 class Network:
     HOST_CLIENT = "192.168.5.132"  # Standard loopback interface address (localhost)
     HOST_SERVER = "0.0.0.0"
-    PORT = 65432  # Port to listen on (non-privileged ports are > 1023)
+    PORT = 65433  # Port to listen on (non-privileged ports are > 1023)
     MAX_MESSAGE_LENGTH = 20000
     sel = selectors.DefaultSelector()
 
