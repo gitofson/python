@@ -390,7 +390,13 @@ class Network:
             # všechna data přenesena
             #else:
                 print(f"received:{data.inb}")
-                App.setSnake(pickle.loads(data.inb))
+                snake = pickle.loads(data.inb)
+                App.setSnake(snake)
+                if snake._is_alive():
+                    pass
+                else:
+                    App._game.snakes.popitem(snake)
+                    sock.close()
                 App.on_execute()
                 # odstranění z monitoringu selectů
                 #Network.sel.unregister(sock)
