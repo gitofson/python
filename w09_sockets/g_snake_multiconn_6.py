@@ -122,8 +122,8 @@ class Game:
                 break
 
 class App:
-    B_WIDTH  = 300
-    B_HEIGHT = 300
+    B_WIDTH  = 900
+    B_HEIGHT = 900
 
     INITIAL_SPEED = 4
     SPEED_LEVEL_LIMIT = 10
