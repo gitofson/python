@@ -392,7 +392,7 @@ class Network:
                 print(f"received:{data.inb}")
                 snake = pickle.loads(data.inb)
                 App.setSnake(snake)
-                if snake._is_alive():
+                if snake._is_alive:
                     pass
                 else:
                     App._game.snakes.popitem(snake)
