@@ -36,7 +36,7 @@ class Snake:
     # délka překážky
     N_OBSTACLE_DOTS = 3
     # max pozice jablka v libovolné ose
-    APPLE_MAX_POS = 29
+    APPLE_MAX_POS = 89
     OBSTACLES =[
             [[10,10], [10,11], [10,12]],
             [[24,24], [25,24], [26,24]],
