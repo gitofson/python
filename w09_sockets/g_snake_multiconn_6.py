@@ -43,12 +43,13 @@ class Snake:
             [[13,12], [13,13], [13,14], [12,13], [14,13]]
         ]
 
-    def __init__(self, y_init, body_color):
+    def __init__(self, y_init, body_color, player_name = "Snake"):
         # unikátní id instance hada uuid4 <=> random 
         self._uuid = str(uuid.uuid4())
         # body = tělo hada, reprezentované seznamem bodů (n-tic) jednotlivých stavebních kamenů o šířce Snake.DOT_SIZE
         self._body = []
         # aktuální pohyb
+        self._name = player_name
         self._movement = Movement.RIGHT
         self._is_apple_consumed = False
         
