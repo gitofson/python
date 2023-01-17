@@ -358,7 +358,7 @@ class App:
 class Network:
     HOST_CLIENT = "192.168.5.132"  # Standard loopback interface address (localhost)
     HOST_SERVER = "0.0.0.0"
-    PORT = 65433  # Port to listen on (non-privileged ports are > 1023)
+    PORT = 65434  # Port to listen on (non-privileged ports are > 1023)
     MAX_MESSAGE_LENGTH = 20000
     sel = selectors.DefaultSelector()
 
@@ -444,7 +444,7 @@ class Network:
                 App.setGame(pickle.loads(data.inb))
                 # v první iteraci vytvoříme hada
                 if createSnake:
-                    App.setSnake(Snake(60, (0,255,0)))
+                    App.setSnake(Snake(60, (100,55,0), 'Lojza'))
                 print(f" create:{createSnake} snakes:{App._game.snakes.keys()}")
                 print(f"delka pred:{len(App.get_client_snake()._body)}")
                 #pohneme s hadem
