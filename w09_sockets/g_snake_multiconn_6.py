@@ -126,7 +126,7 @@ class App:
     B_WIDTH  = 900
     B_HEIGHT = 900
 
-    INITIAL_SPEED = 4
+    INITIAL_SPEED = 7
     SPEED_LEVEL_LIMIT = 10
 
     d_level_mid = {
@@ -431,7 +431,9 @@ class Network:
                 if snake._is_alive:
                     pass
                 else:
-                    App._game.snakes.pop(snake._uuid)
+                    #App._game.snakes.pop(snake._uuid)
+                    del App._game.snakes[snake._uuid]
+                    Network.sel.unregister(sock)
                     sock.close()
                 App.on_execute()
                 # odstranění z monitoringu selectů
