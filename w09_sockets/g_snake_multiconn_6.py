@@ -328,14 +328,45 @@ class App:
         pygame.quit()
 
     @staticmethod
+    def processAi():
+        snake = App.get_client_snake()
+        snake._body[0]
+        if snake._movement==Movement.RIGHT and (
+            snake._body[0][0]==App.B_WIDTH-2*Snake.DOT_SIZE
+            or
+            snake._body[0][0]==App._game.apple_position[0]   
+        ):
+            snake._movement=Movement.DOWN
+        elif snake._movement==Movement.DOWN and (
+            snake._body[0][1]==App._game.apple_position[1]
+            or
+            snake._body[0][1]==App.B_HEIGHT-2*Snake.DOT_SIZE
+        ):
+            snake._movement=Movement.LEFT
+        elif snake._movement==Movement.LEFT and (
+            snake._body[0][0]==App._game.apple_position[0]
+            or
+            snake._body[0][0]==Snake.DOT_SIZE
+        ):
+            snake._movement=Movement.UP
+        elif snake._movement==Movement.UP and (
+            snake._body[0][1]==App._game.apple_position[1]
+            or
+            snake._body[0][1]==Game.SCORE_SCREEN_HEIGHT+Snake.DOT_SIZE
+        ):
+            snake._movement=Movement.RIGHT
+    @staticmethod
     def on_execute():
         # game loop
         if App._game._running:
             App._display_surf.fill((0, 0, 0))
             # zpracování všech typů událostí (netýká se serveru, resp. pozorovtele - observer)
             if not App.is_server_mode():
-                for event in pygame.event.get():
-                    App.on_event(App.get_client_snake(), event)
+                if len(sys.argv) > 1 and sys.argv[1] == "a":
+                    App.processAi()
+                else:    
+                    for event in pygame.event.get():
+                        App.on_event(App.get_client_snake(), event)
                 App.on_loop(App.get_client_snake())
                 App.on_render(App.get_client_snake())
         else:
@@ -358,7 +389,7 @@ class App:
 class Network:
     HOST_CLIENT = "192.168.5.132"  # Standard loopback interface address (localhost)
     HOST_SERVER = "0.0.0.0"
-    PORT = 65434  # Port to listen on (non-privileged ports are > 1023)
+    PORT = 65433  # Port to listen on (non-privileged ports are > 1023)
     MAX_MESSAGE_LENGTH = 20000
     sel = selectors.DefaultSelector()
 
@@ -400,7 +431,7 @@ class Network:
                 if snake._is_alive:
                     pass
                 else:
-                    App._game.snakes.popitem(snake)
+                    App._game.snakes.pop(snake._uuid)
                     sock.close()
                 App.on_execute()
                 # odstranění z monitoringu selectů
