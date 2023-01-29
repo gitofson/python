@@ -20,3 +20,6 @@
 #         tests.py    – Obsahuje jednotkové testy.
 #         __init__.py – Dělá z aplikace balíček Pythonu.
 # 4. Do settings.py do INSTALLED_APPS přidat název naší aplikace. Pak vytvořit v adresáři naší aplikace adresář templates a vyzkoušet, např.:
+
+# Návod pro použití s Apache2:
+#    https://docs.djangoproject.com/en/4.1/howto/deployment/wsgi/modwsgi/
