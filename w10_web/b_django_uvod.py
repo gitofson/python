@@ -1,8 +1,11 @@
-# Django - open source webový aplikační framework napsaný v Pythonu, který se volně drží architektury Model-Pohled-Šablona (Model-View-Template).
+# Django - open source webový aplikační framework napsaný v Pythonu, 
+# který se volně drží architektury Model-Pohled-Šablona (Model-View-Template).
 # w3school tutorial: https://www.w3schools.com/django/index.php
 # popis šablon:      https://docs.djangoproject.com/en/1.10/ref/templates/builtins/
 # 
-# 
+# Instalace:
+# py.exe -m pip install -U django --user
+#
 # Standardní postup pro vytvoření projektu skriptem po instalaci knihovny Django do lokální instalace Pythonu:
 # 1. Vytvoření projektu:
 #     django-admin.exe startproject hello_world_project
