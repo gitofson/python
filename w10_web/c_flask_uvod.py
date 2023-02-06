@@ -1,8 +1,8 @@
 
-# flask -
+# Flask - mikrowebový framework, neobsahuje abstrakce pro DB, další vnitřní knihovny ani žádné jiné komponenty třetích stran.
+#         Používá šablonovací systém Jinja, který obdobně jako Django využívá pro přístup k proměnným {{ }} a pro příkazy {% %} 
 # tutorial:
 # https://www.tutorialspoint.com/flask/
-# případně: https://flask.palletsprojects.com/en/2.2.x/tutorial/
 # instalace: 
 # py.exe -m pip install -U flask --user
 # 
