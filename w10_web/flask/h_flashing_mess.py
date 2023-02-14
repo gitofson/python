@@ -16,6 +16,7 @@ def login():
          error = 'Invalid username or password. Please try again!'
       else:
          flash('You were successfully logged in')
+         print("flashed!")
          return redirect(url_for('index'))
    return render_template('h_login.html', error = error)
 
