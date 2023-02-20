@@ -16,4 +16,15 @@
 
 # Schön Otto	            Pygame, shoothemup          https://github.com/OtanCZ/shootemup-pygame
 # Vít Vojtěch               Pygame, tetris              https://github.com/vojtechos/PythonProject
-# Zikmund Radek             
+
+# Zikmund Radek             Pygame, Pong                https://github.com/radekz10/TableTennisPython
+# custom 2D palky, micek, stul, menu , tabulka se score - textury
+# kolize
+# odrazeni, pohyb micku
+# ui
+# game menu
+# player statistiky
+# ovladani WSAD, IJKL
+# random velikost micku
+# random zrychleni
+# mody - solo, 1v1 na klavesnici
