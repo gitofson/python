@@ -3,7 +3,7 @@
 # Jednoduchá, přenositelná, často používaná, nepotřebuje GUI pro návrh her, podporovaná vývojáři, expresivní
 # (stačí malé množství kódu), modulární.
 # instalace:
-# python3 -m pip install -U pygame --user
+# py -m pip install -U pygame --user
 # případně
 # pip install pygame --pre
 # test:
