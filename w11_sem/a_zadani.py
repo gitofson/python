@@ -2,7 +2,7 @@
 # Fiala Marek           Django, správa knihovny             https://github.com/marekfiala/python_knihovna
 # Hofman Jan            Pygame, Flappy Bird                 https://github.com/hofmic92/FlappyBirdPy
 # Hojný Martin          Pygame, šibenice                    https://github.com/AntiIllegal/python-game
-# Jiránek Jiří          Textové RPG                         https://github.com/JirkaJiry/Python_text_RPG 
+# Jiránek Jiří          Textové RPG                         https://github.com/JirkaJiry/python_text_rpg 
 # Kargl Tomáš           Tkinter, Tic Tac Toe                https://github.com/kargltomas/Tic-tac-toe
 # Novák Adam            Pygame, rock paperr scissors        https://github.com/Buftik/PythonProj
 # Novák Štěpán          Pygame, Breakout                    https://github.com/SH4RK7/Breakout
