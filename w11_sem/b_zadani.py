@@ -11,7 +11,7 @@
 # Novotný Jakub             Pygame, Minesweeper         
 # obdoba https://zetcode.com/javagames/minesweeper/
 
-# Poláček Jan               
+# Poláček Jan               Pygame, skateboard gamme    https://github.com/neostetic/python-skater-game
 # Reindl Erik               Pygame,                     https://github.com/KRBNJSF/PythonGame
 
 # Schön Otto	            Pygame, shoothemup          https://github.com/OtanCZ/shootemup-pygame
