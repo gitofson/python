@@ -1,4 +1,4 @@
-# Bílek Daniel	
+# Bílek Daniel	        Tkinter, chatovací aplikace         https://github.com/Daniel2B9/Chat-app-python-tkinter
 # Fiala Marek           Django, správa knihovny             https://github.com/marekfiala/python_knihovna
 # Hofman Jan            Pygame, Flappy Bird                 https://github.com/hofmic92/FlappyBirdPy
 # Hojný Martin          Pygame, šibenice                    https://github.com/AntiIllegal/python-game
@@ -10,6 +10,7 @@
 # Škrabánek Lukáš       Pygame, tetris                      https://github.com/Raysenn/TetrisGame
 # inspirace: https://zetcode.com/javagames/tetris/
 
-# Tondl Tadeáš
+# Tondl Tadeáš          Pygame, Pong                        https://github.com/tadeastondl/Pygame-Pong                  
 # Vítek Jan             Flask, Weather Focus                https://github.com/Hanis03/py_project_4
-# Zralý Matěj
+# Zralý Matěj           Pygame, Space Invaders              https://github.com/matejzraly/Space-Invaders
+# inspirace: https://zetcode.com/javagames/spaceinvaders/
