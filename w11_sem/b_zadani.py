@@ -12,7 +12,7 @@
 # obdoba https://zetcode.com/javagames/minesweeper/
 
 # Poláček Jan               Pygame, skateboard gamme    https://github.com/neostetic/python-skater-game
-# Reindl Erik               Pygame,                     https://github.com/KRBNJSF/PythonGame
+# Reindl Erik               Pygame, stone collecting g. https://github.com/KRBNJSF/PythonGame
 
 # Schön Otto	            Pygame, shoothemup          https://github.com/OtanCZ/shootemup-pygame
 # Vít Vojtěch               Pygame, tetris              https://github.com/vojtechos/PythonProject
