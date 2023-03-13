@@ -1,0 +1,11 @@
+#https://github.com/pyqt/examples
+from PyQt5.QtWidgets import *
+app = QApplication([])
+window = QWidget()
+layout = QVBoxLayout()
+for n in range(10):
+    layout.addWidget(QPushButton(str(n)))
+#layout.addWidget(QPushButton('Bottom'))
+window.setLayout(layout)
+window.show()
+app.exec()
