@@ -1,0 +1,40 @@
+
+from tkinter import *
+from tkinter import ttk
+class Gui:
+    def __init__(self):
+        root = Tk()
+        # specify size of window
+        root.geometry("250x170")
+        # frm = ttk.Frame(root, padding=10)
+        # Create text widget and specify size. Not available in ttk.
+        T = Text(root, height = 5, width = 52)
+        #ttk. .Text(root, height = 5, width = 52)
+        # Create label
+        l = Label(root, text = "Fact of the Day")
+        #ttk.Label(root, font =("Courier", 14))
+        l.config(font =("Courier", 14))
+
+        Fact = """A man can be arrested in
+        Italy for wearing a skirt in public."""
+        
+        # Create button for next text.
+        b1 = Button(root, text = "Next", )
+        #ttk.Button(root, text = "Next", )
+        
+        # Create an Exit button.
+        b2 = Button(root, text = "Exit",
+                    command = root.destroy)
+        #ttk.Button(root, text = "Exit",command = root.destroy)
+        
+        l.pack()
+        T.pack()
+        b1.pack()
+        b2.pack()
+        
+        # Insert The Fact.
+        T.insert(END, Fact)
+        
+        root.mainloop()
+if __name__=="__main__":
+    gui = Gui()
