@@ -23,6 +23,7 @@
 # obdoba https://zetcode.com/javagames/minesweeper/
 
 # Poláček Jan               Pygame, skateboard gamme    https://github.com/neostetic/python-skater-game
+<<<<<<< HEAD
 # Dodělat
 #    omezený pohyb hráče
 #    přidat překážky,
@@ -33,6 +34,9 @@
 # pozadí
 # hudba,
 # zvuky
+=======
+# Reindl Erik               Pygame, stone collecting g. https://github.com/KRBNJSF/PythonGame
+>>>>>>> tk
 
 # Schön Otto	            Pygame, shoothemup          https://github.com/OtanCZ/shootemup-pygame
 # Vít Vojtěch               Pygame, tetris              https://github.com/vojtechos/PythonProject
