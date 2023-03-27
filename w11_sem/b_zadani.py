@@ -27,8 +27,12 @@
 #  použít oop (hlavně pro možnost více stejných příšer na různých místech),
 #  přidat mapu.
 
-# Novotný Jakub             Pygame, Minesweeper         
+# Novotný Jakub             Pygame, Minesweeper           
 # obdoba https://zetcode.com/javagames/minesweeper/
+# dodělat:
+# objasnit princip rekurzivní metody dig
+# hudba, zvuky
+# 
 
 # Poláček Jan               Pygame, skateboard gamme    https://github.com/neostetic/python-skater-game
 # Dodělat
