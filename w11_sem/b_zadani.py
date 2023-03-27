@@ -5,12 +5,20 @@
 #   lepší dekorace pomocí fontů.
 						 		 	
 # Demjan Mattias Justin     Flask, Babiččiny recepty    https://github.com/MattiasJD/piton-seminarni-arbeit
+# dodělat
+# čitelnější stránka (změna fontu)
+# detail receptu včetně fotografie
 
 # Kočí František            Pygame, tanky               https://github.com/KociFanda/TankPython
 # Dva tanky, každý tank ovládá jeden hráč# #Snaží se navzájem zastřelit 
 # #Kolize tanků, střel a krajů obrazovky #Životy tanků #Oživování tanků #Skore
 
-# Krouský Robin             Pygame, Dyno game           
+# Krouský Robin             Pygame, Dyno game           https://github.com/Medvid3k/MujDinoProjekt       
+# vlastní sprity
+# předělat do OOP
+# zvuk, hudba měnící se podle score
+# síň slávy
+# 
 # Novák Filip               Textové RPG                 https://github.com/filipusnovakus/PythonRPG
 # dokončit 
 #  shop, 
@@ -23,7 +31,6 @@
 # obdoba https://zetcode.com/javagames/minesweeper/
 
 # Poláček Jan               Pygame, skateboard gamme    https://github.com/neostetic/python-skater-game
-<<<<<<< HEAD
 # Dodělat
 #    omezený pohyb hráče
 #    přidat překážky,
@@ -34,9 +41,6 @@
 # pozadí
 # hudba,
 # zvuky
-=======
-# Reindl Erik               Pygame, stone collecting g. https://github.com/KRBNJSF/PythonGame
->>>>>>> tk
 
 # Schön Otto	            Pygame, shoothemup          https://github.com/OtanCZ/shootemup-pygame
 # Vít Vojtěch               Pygame, tetris              https://github.com/vojtechos/PythonProject
