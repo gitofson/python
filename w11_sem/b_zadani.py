@@ -60,3 +60,8 @@
 # random velikost micku
 # random zrychleni
 # mody - solo, 1v1 na klavesnici
+# dodělat
+# statistiky (počet výher)
+# fyzika míčku
+# počítadlo skóre
+# hudba, zvuky
