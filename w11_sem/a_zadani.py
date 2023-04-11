@@ -45,6 +45,7 @@
 # dodělat OOP
 # barvy kostiček
 # zvuky, případně hudbu
+
 # score
 # kostičku mlýn
 
